@@ -7,114 +7,115 @@ from urllib.request import urlopen
 import requests
 import urllib.request
 import urllib.parse
+from defines import *
 
-bot = telebot.TeleBot("325597084:AAF4cA-uCDYjmd7m0-pSaIxwyD7kjH7MLlg")
+
+bot = telebot.TeleBot(BOT_TOKEN)
+# this dictionary has key=source_identifier and value=list where
+# list contains 3 elements: source_url, getter_function (use to load data from MinCult)
+# and slicer funciton (use to slice some data)
+events_info = {}
+
+
+def initialize():
+    events_info[FILMS_IDENTIFIER] = [FILMS_URL, get_list_of_events, get_slice_of_events]
+    events_info[LECTURES_IDENTIFIER] = [LECTURES_URL, get_list_of_events, get_slice_of_events]
+    # Spektakli
+    events_info[TRAGICOMEDY_IDENTIFIER] = [TRAGICOMEDY_URL, get_list_of_events, get_slice_of_events]
+    events_info[MODERN_ART_IDENTIFIER] = [MODERN_ART_URL, get_list_of_events, get_slice_of_events]
+    events_info[CLASSIC_ART_IDENTIFIER] = [CLASSIC_ART_URL, get_list_of_events, get_slice_of_events]
+    events_info[DRAMA_IDENTIFIER] = [DRAMA_URL, get_list_of_events, get_slice_of_events]
+    events_info[COMEDY_IDENTIFIER] = [COMEDY_URL, get_list_of_events, get_slice_of_events]
+    events_info[BALLET_IDENTIFIER] = [BALLET_URL, get_list_of_events, get_slice_of_events]
+    events_info[MONOSPECT_IDENTIFIER] = [MONOSPECT_URL, get_list_of_events, get_slice_of_events]
+    events_info[EXP_THEATRE_IDENTIFIER] = [EXP_THEATRE_URL, get_list_of_events, get_slice_of_events]
+    events_info[PUPPET_SHOW_IDENTIFIER] = [PUPPET_SHOW_URL, get_list_of_events, get_slice_of_events]
+    events_info[FOLKLORE_IDENTIFIER] = [FOLKLORE_URL, get_list_of_events, get_slice_of_events]
+    # Koncerty
+    events_info[OPERA_IDENTIFIER] = [OPERA_URL, get_list_of_events, get_slice_of_events]
+    events_info[CLASSIC_MUSIC_IDENTIFIER] = [CLASSIC_MUSIC_URL, get_list_of_events, get_slice_of_events]
+    events_info[FOLKLORE_MUSIC_IDENTIFIER] = [FOLKLORE_MUSIC_URL, get_list_of_events, get_slice_of_events]
+    events_info[JAZZ_IDENTIFIER] = [JAZZ_URL, get_list_of_events, get_slice_of_events]
+    events_info[ORGAN_MUSIC_IDENTIFIER] = [ORGAN_MUSIC_URL, get_list_of_events, get_slice_of_events]
+    events_info[AUTHOR_SONG_IDENTIFIER] = [AUTHOR_SONG_URL, get_list_of_events, get_slice_of_events]
+    # Vystavki
+    events_info[MODERN_ART_EXHIBIT_IDENTIFIER] = [MODERN_ART_EXHIBIT_URL, get_list_of_events, get_slice_of_events]
+    events_info[PHOTO_IDENTIFIER] = [PHOTO_URL, get_list_of_events, get_slice_of_events]
+    events_info[GRAPHIC_IDENTIFIER] = [GRAPHIC_URL, get_list_of_events, get_slice_of_events]
+    events_info[PAINTING_IDENTIFIER] = [PAINTING_URL, get_list_of_events, get_slice_of_events]
+    events_info[DESIGN_IDENTIFIER] = [DESIGN_URL, get_list_of_events, get_slice_of_events]
+    events_info[SCULPTURE_IDENTIFIER] = [SCULPTURE_URL, get_list_of_events, get_slice_of_events]
+
+def get_url_for_identifier(source_identifier):
+    return events_info[source_identifier][0]
+
+def get_getter_for_identifier(source_identifier):
+    return events_info[source_identifier][1]
+
+def get_slicer_for_identifier(source_identifier):
+    return events_info[source_identifier][2]
 
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.ReplyKeyboardMarkup(one_time_keyboard=True)
-    markup.add('Выставки \U0001F3A8', 'Спектакли \U0001F3AD', 'Концерты \U0001F3BC', 'Кинопоказ \U0001F4FA', 'Лекции \U0001F4DA') 
-    next_step = bot.send_message(message.chat.id, 'Выберете интересующее вас направление.', reply_markup=markup)
-    bot.register_next_step_handler(next_step, process_step)
-    username = str(message.chat.username)
+    markup.add('Выставки \U0001F3A8',
+            'Спектакли \U0001F3AD',
+            'Концерты \U0001F3BC',
+            'Кинопоказ \U0001F4FA',
+            'Лекции \U0001F4DA')
+    next_step = bot.send_message(message.chat.id,
+            'Выберете интересующее вас направление.',
+            reply_markup=markup)
+    bot.register_next_step_handler(next_step, process_main_step)
+
+    # Process stats
+    #username = message.chat.username
+    #print(username)
     #send_stat = urllib.request.urlopen("http://admin.theartr.ru/stat_backend/user?username="+username + '&action=connected')
-
-    #print (username)
-
     # GET запрос
     #data = {"username": username, 'action': 'connected'}
     #enc_data = urllib.parse.urlencode(data)
     #url_connection = urllib.request.urlopen("http://admin.theartr.ru/stat_backend/user" + "?" + enc_data)
     #print(url_connection.read())
 
-
-
-# Globally defined types
-PAGE_STEP = 3
-FILMS_IDENTIFIER = 4
-LECTURES_IDENTIFIER = 5
-
-def get_list_of_films():
-    resp = urlopen("https://all.culture.ru/api/2.2/events?status=accepted&start=1488821641399&locales=2579&tags=164").read().decode('utf8')
+def get_list_of_events(url):
+    resp = urlopen(url).read().decode('utf8')
     events = json.loads(resp)
-    events_films = []
+
+    events_list = []
     for event in events['events']:
-        events_films.append({'name': event['name'], 'place': event['places'][0]['name'], 'address': event['places'][0]['address'],
-            'price': event['price'], "shortDescription": event["shortDescription"], "url": event["externalInfo"][0]['url']})
-    return events_films
+        # NOTE: we use only first place for 'place' and 'address', maybe it's wrong
+        # The same case for 'url'
+        events_list.append({'name': event['name'], 'place': event['places'][0],
+            'address': event['places'][0]['address'], 'price': event['price'],
+            'shortDescription': event['shortDescription'], 'ext_info': event['externalInfo'][0]})
 
-def get_slice_of_films(events_films, start, stop):
+    return events_list
+
+
+def get_slice_of_events(events_list, start, stop):
     result = ''
-    for event in events_films[start : stop]:
-        if('name' in event):
-            name = '*' + event['name'] + '*' + '\n\n'
-        else:
-            name = ''
 
+    for event in events_list[start : stop]:
+        name = '*' + event['name'] + '*' + '\n\n'
+        place = ''
         if('name' in event['place']):
-            place = 'Место проведения: ' + event['place'] + '\n\n'
-        else:
-            place = ''
-
+            place = 'Место проведения: ' + event['place']['name'] + '\n\n'
+        address = ''
         if('source' in event['address']):
             address = 'Адрес: ' + event['address']['source'] + '\n\n'
-        else:
-            address = ''
-
-        if("shortDescription" in event):
-            short_desc = 'Краткое описание: ' + event['shortDescription'] + '\n\n'
-        else:
-            short_desc = ''
-        if('url' in event):
-            show_url = 'Подробнее: ' + event['url'] + '\n\n'
-        else:
-            show_url = ''
-
+        short_desc = 'Краткое описание: ' + event['shortDescription'] + '\n\n'
+        show_url = ''
+        if('url' in event['ext_info']):
+            show_url = 'Подробнее: ' + event['ext_info']['url'] + '\n\n'
         result += name + place + address + short_desc + show_url + '\n\n'
-    return result
 
-def get_list_of_lectures():
-        resp = urlopen("https://all.culture.ru/api/2.2/events?status=accepted&start=1488821641399&locales=2579&&tags=102").read().decode('utf8')
-        events = json.loads(resp)
-        events_lectures = []
-        for event in events['events']:
-            events_lectures.append({'name': event['name'], 'place': event['places'][0]['name'], 'address': event['places'][0]['address'], 
-                'price': event['price'], "shortDescription": event["shortDescription"], "url": event["externalInfo"][0]['url']})  
-        return events_lectures
-
-def get_slice_of_lectures(events_lectures, start, stop):        
-    result = ''
-    for event in events_lectures[start : stop]:
-        if('name' in event):
-            name = '*' + event['name'] + '*' + '\n\n'
-        else:
-            name = ''
-
-        if('name' in event['place']):
-            place = 'Место проведения: ' + event['place'] + '\n\n'
-        else:
-            place = ''
-
-        if('source' in event['address']):
-            address = 'Адрес: ' + event['address']['source'] + '\n\n'
-        else:
-            address = ''
-
-        if("shortDescription" in event):
-            short_desc = 'Краткое описание: ' + event['shortDescription'] + '\n\n'
-        else:
-            short_desc = ''
-        if('url' in event):
-            show_url = 'Подробнее: ' + event['url'] + '\n\n'
-        else:
-            show_url = ''
-
-        result += name + place + address + short_desc + show_url + '\n\n'
     return result
 
 
 def make_inline_buttons(start, stop, source_len, source_identifier):
     keyboard = types.InlineKeyboardMarkup()
+
     btns = []
     if start > 0:
         btns.append(types.InlineKeyboardButton(
@@ -123,6 +124,7 @@ def make_inline_buttons(start, stop, source_len, source_identifier):
         btns.append(types.InlineKeyboardButton(
             text='\U000027A1', callback_data='{}_{}'.format(source_identifier, stop)))
     keyboard.add(*btns)
+
     return keyboard
 
 
@@ -130,37 +132,32 @@ def make_inline_buttons(start, stop, source_len, source_identifier):
 def do_pagination(c):
     parts = c.data.split('_')
     if len(parts) != 2:
-        print("Something wrong")
+        print("invalid data in callback query handler")
         return
 
     source_identifier = int(parts[0])
+    print('received source_identifier {}'.format(source_identifier))
+    if not source_identifier in events_info:
+        print("invalid identifier in callback query handler")
+        return
+
     offset = int(parts[1])
-
-    if source_identifier == FILMS_IDENTIFIER:
-        events_list = get_list_of_films()
-        text = get_slice_of_films(events_list, offset, offset + PAGE_STEP)
-        bot.edit_message_text(
-            chat_id = c.message.chat.id,
-            message_id = c.message.message_id,
-            text = text,
-            parse_mode = 'Markdown',
-            reply_markup = make_inline_buttons(offset, offset + PAGE_STEP, len(events_list), FILMS_IDENTIFIER))
-
-    elif source_identifier == LECTURES_IDENTIFIER:
-        events_list = get_list_of_lectures()
-        text = get_slice_of_films(events_list, offset, offset + PAGE_STEP)
-        bot.edit_message_text(
-            chat_id = c.message.chat.id,
-            message_id = c.message.message_id,
-            text = text,
-            parse_mode = 'Markdown',
-            reply_markup = make_inline_buttons(offset, offset + PAGE_STEP, len(events_list), LECTURES_IDENTIFIER))
-    else:
-        print("Unknown source identifier (maybe didn't implemented)")
+    # prepare data for source_identifier
+    event_url = get_url_for_identifier(source_identifier)
+    events_list = get_getter_for_identifier(source_identifier)(event_url)
+    text = get_slicer_for_identifier(source_identifier)(events_list, offset, offset + PAGE_STEP)
+    # send data to user
+    bot.edit_message_text(
+        chat_id = c.message.chat.id,
+        message_id = c.message.message_id,
+        text = text,
+        parse_mode = 'Markdown',
+        reply_markup = make_inline_buttons(offset, offset + PAGE_STEP, len(events_list), source_identifier))
 
 
-def process_step(message):
+def process_main_step(message):
     chat_id = message.chat.id
+
     if message.text=='Спектакли \U0001F3AD':
         print('Performances')
 
@@ -189,42 +186,23 @@ def process_step(message):
         markup.row(item10)
         markup.row(item)
 
-        next_step = bot.send_message(message.chat.id,'Какое направление предпочитаете? \nДля полного списка прокрутите вниз!', reply_markup=markup)
-        bot.register_next_step_handler(next_step, process_step_2) 
+        next_step = bot.send_message(message.chat.id,
+                'Какое направление предпочитаете? \nДля полного списка прокрутите вниз!', reply_markup=markup)
+        bot.register_next_step_handler(next_step, process_step_2)
 
     elif message.text==('Кинопоказ \U0001F4FA'):
         #url_cat2 = urllib.request.urlopen('http://admin.theartr.ru/stat_backend/click?cat1=Film_screening&username=' + message.chat.username)
         print('Film screening')
-
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        item =  types.KeyboardButton('Главное меню')
-        markup.row(item) 
-
-        events_list = get_list_of_films()
-        text = get_slice_of_films(events_list, 0, PAGE_STEP)
-        next_step = bot.send_message(message.chat.id, text, reply_markup=markup, reply_markup=make_inline_buttons(0, PAGE_STEP, len(events_list), FILMS_IDENTIFIER), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2) 
+        make_first_answer(FILMS_IDENTIFIER, chat_id)
 
     elif message.text==('Лекции \U0001F4DA'):
         #url_cat2 = urllib.request.urlopen('http://admin.theartr.ru/stat_backend/click?cat1=Lectures&username=' + message.chat.username)
         print('Lectures')
-
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        item =  types.KeyboardButton('Главное меню')
-        markup.row(item) 
-
-        events_list = get_list_of_lectures()
-        text = get_slice_of_lectures(events_list, 0, PAGE_STEP)
-        next_step = bot.send_message(message.chat.id, text, reply_markup=markup, reply_markup=make_inline_buttons(0, PAGE_STEP, len(events_list), LECTURES_IDENTIFIER), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2) 
-
-        #next_step = bot.send_message(message.chat.id, result, reply_markup=markup, parse_mode='Markdown')
-        
+        make_first_answer(LECTURES_IDENTIFIER, chat_id)
 
     elif message.text=='Концерты \U0001F3BC':
+        #url_cat2 = urllib.request.urlopen('http://admin.theartr.ru/stat_backend/click?cat1=Concerts&username=' + message.chat.username)
         print('Concerts')
-
-        url_cat2 = urllib.request.urlopen('http://admin.theartr.ru/stat_backend/click?cat1=Concerts&username=' + message.chat.username)
 
         markup = types.ReplyKeyboardMarkup()
         item1 = types.KeyboardButton("Опера")
@@ -243,13 +221,14 @@ def process_step(message):
         markup.row(item6)
         markup.row(item)
 
-        next_step = bot.send_message(message.chat.id, 'Какое направление предпочитаете? \nДля полного списка прокрутите вниз!', reply_markup=markup)
-        bot.register_next_step_handler(next_step, process_step_2) 
+        next_step = bot.send_message(message.chat.id,
+                'Какое направление предпочитаете? \nДля полного списка прокрутите вниз!',
+                reply_markup=markup)
+        bot.register_next_step_handler(next_step, process_step_2)
 
     elif message.text=='Выставки \U0001F3A8':
+        #url_cat2 = urllib.request.urlopen('http://admin.theartr.ru/stat_backend/click?cat1=Exhibitions&username=' + message.chat.username)
         print('Exhibitions')
-
-        url_cat2 = urllib.request.urlopen('http://admin.theartr.ru/stat_backend/click?cat1=Exhibitions&username=' + message.chat.username)
 
         markup = types.ReplyKeyboardMarkup()
         item1 = types.KeyboardButton("Современное Искусство")
@@ -268,148 +247,88 @@ def process_step(message):
         markup.row(item6)
         markup.row(item)
 
-        next_step = bot.send_message(message.chat.id, 'Какое направление предпочитаете? \n Для полного списка прокрутите вниз!', reply_markup=markup)
-        bot.register_next_step_handler(next_step, process_step_2) 
-
+        next_step = bot.send_message(message.chat.id,
+                'Какое направление предпочитаете? \n Для полного списка прокрутите вниз!',
+                reply_markup=markup)
+        bot.register_next_step_handler(next_step, process_step_2)
 
 
 def process_step_2(message):
     chat_id = message.chat.id
+
     if message.text==("Трагикомедия"):
-        next_step = bot.send_message(message.chat.id, create_response("Performances", "Tragic", "https://all.culture.ru/api/2.2/events?status=accepted&locales=2579&categories=spektakli&tags=9", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2)
+        make_first_answer(TRAGICOMEDY_IDENTIFIER, chat_id)
+    # this is performance
     elif message.text==("Современное искусство"):
-        next_step = bot.send_message(message.chat.id, create_response("Performances","Modern_art", "https://all.culture.ru/api/2.2/events?status=accepted&locales=2579&categories=spektakli&tags=26", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2)
+        make_first_answer(MODERN_ART_IDENTIFIER, chat_id)
     elif message.text==('Классическое искусство'):
-        next_step = bot.send_message(message.chat.id, create_response("Performances", "Classical_art", "https://all.culture.ru/api/2.2/events?status=accepted&locales=2579&categories=spektakli&tags=25", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2)
+        make_first_answer(CLASSIC_ART_IDENTIFIER, chat_id)
     elif message.text==('Драма'):
-        next_step = bot.send_message(message.chat.id, create_response("Performances", "Drama", "https://all.culture.ru/api/2.2/events?status=accepted&locales=2579&categories=spektakli&tags=267", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2)
+        make_first_answer(DRAMA_IDENTIFIER, chat_id)
     elif message.text==('Комедия'):
-        next_step = bot.send_message(message.chat.id, create_response("Performances", "Comedy", "https://all.culture.ru/api/2.2/events?status=accepted&locales=2579&categories=spektakli&tags=266", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2) 
+        make_first_answer(COMEDY_IDENTIFIER, chat_id)
     elif message.text==('Балет'):
-        next_step = bot.send_message(message.chat.id, create_response("Performances", "Ballet", "https://all.culture.ru/api/2.2/events?status=accepted&locales=2579&categories=spektakli&tags=31", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2) 
+        make_first_answer(BALLET_IDENTIFIER, chat_id)
     elif message.text==('Моноспектакль'):
-        next_step = bot.send_message(message.chat.id, create_response("Performances", "Monospect", "https://all.culture.ru/api/2.2/events?status=accepted&locales=2579&categories=spektakli&tags=260", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2)   
+        make_first_answer(MONOSPECT_IDENTIFIER, chat_id)
     elif message.text==('Эксперементальный театр'):
-        next_step = bot.send_message(message.chat.id, create_response("Performances", "Experimental_theatre", "https://all.culture.ru/api/2.2/events?status=accepted&locales=2579&categories=spektakli&tags=97", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2) 
+        make_first_answer(EXP_THEATRE_IDENTIFIER, chat_id)
     elif message.text==('Кукольный спектакль'):
-        next_step = bot.send_message(message.chat.id, create_response("Performances", "Puppet_show", "https://all.culture.ru/api/2.2/events?status=accepted&locales=2579&categories=spektakli&tags=184", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2) 
+        make_first_answer(PUPPET_SHOW_IDENTIFIER, chat_id)
     elif message.text==('Фольклор'):
-        next_step = bot.send_message(message.chat.id, create_response("Performances", "Folklore", "https://all.culture.ru/api/2.2/events?status=accepted&locales=2579&categories=spektakli&tags=208", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2) 
+        make_first_answer(FOLKLORE_IDENTIFIER, chat_id)
     elif message.text==('Опера'):
-        next_step = bot.send_message(message.chat.id, create_response("Concerts", "Opera", "https://all.culture.ru/api/2.2/events?status=accepted&start=1488821641399&locales=2579&categories=koncerty&tags=30", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2) 
+        make_first_answer(OPERA_IDENTIFIER, chat_id)
     elif message.text==('Классическая музыка'):
-        next_step = bot.send_message(message.chat.id, create_response("Concerts", "Classical_music", "https://all.culture.ru/api/2.2/events?status=accepted&start=1488821641399&locales=2579&categories=koncerty&tags=158", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2) 
+        make_first_answer(CLASSIC_MUSIC_IDENTIFIER, chat_id)
     elif message.text==('Фольклорная музыка'):
-        next_step = bot.send_message(message.chat.id, create_response("Concerts", "Folklore_music", "https://all.culture.ru/api/2.2/events?status=accepted&start=1488821641399&locales=2579&categories=koncerty&tags=208", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2) 
+        make_first_answer(FOLKLORE_MUSIC_IDENTIFIER, chat_id)
     elif message.text==('Джаз'):
-        next_step = bot.send_message(message.chat.id, create_response("Concerts", "Jazz", "https://all.culture.ru/api/2.2/events?status=accepted&start=1488821641399&locales=2579&categories=koncerty&tags=155", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2) 
+        make_first_answer(JAZZ_IDENTIFIER, chat_id)
     elif message.text==('Органная музыка'):
-        next_step = bot.send_message(message.chat.id, create_response("Concerts", "Organ_music", "https://all.culture.ru/api/2.2/events?status=accepted&start=1488821641399&locales=2579&categories=koncerty&tags=157", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2)
+        make_first_answer(ORGAN_MUSIC_IDENTIFIER, chat_id)
     elif message.text==('Авторская песня'):
-        next_step = bot.send_message(message.chat.id, create_response("Concerts", "Author_song", "https://all.culture.ru/api/2.2/events?status=accepted&start=1488821641399&locales=2579&categories=koncerty&tags=181", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2)
+        make_first_answer(AUTHOR_SONG_IDENTIFIER, chat_id)
+    # this is exhibition
     elif message.text==('Современное Искусство'):
-        next_step = bot.send_message(message.chat.id, create_response("Exhibitions", "Modern_art_exhibit", 'https://all.culture.ru/api/2.2/events?status=accepted&start=1488821641399&locales=2579&categories=vystavki&tags=26', message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2) 
+        make_first_answer(MODERN_ART_EXHIBIT_IDENTIFIER, chat_id)
     elif message.text==('Фотография'):
-        next_step = bot.send_message(message.chat.id, create_response("Exhibitions", "Photo", "https://all.culture.ru/api/2.2/events?status=accepted&start=1488821641399&locales=2579&categories=vystavki&tags=50", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2)  
+        make_first_answer(PHOTO_IDENTIFIER, chat_id)
     elif message.text==('Графика'):
-        next_step = bot.send_message(message.chat.id, create_response("Exhibitions", "Graphic", "https://all.culture.ru/api/2.2/events?status=accepted&start=1488821641399&locales=2579&categories=vystavki&tags=160", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2)  
+        make_first_answer(GRAPHIC_IDENTIFIER, chat_id)
     elif message.text==('Живопись'):
-        next_step = bot.send_message(message.chat.id, create_response("Exhibitions", "Painting", "https://all.culture.ru/api/2.2/events?status=accepted&start=1488821641399&locales=2579&categories=vystavki&tags=163", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2) 
+        make_first_answer(PAINTING_IDENTIFIER, chat_id)
     elif message.text==('Дизайн'):
-        next_step = bot.send_message(message.chat.id, create_response("Exhibitions", "Design", "https://all.culture.ru/api/2.2/events?status=accepted&start=1488821641399&locales=2579&categories=vystavki&tags=48", message), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2) 
+        make_first_answer(DESIGN_IDENTIFIER, chat_id)
     elif message.text==('Скульптура'):
-        next_step = bot.send_message(message.chat.id, create_response("Exhibitions", "Sculpture", "https://all.culture.ru/api/2.2/events?status=accepted&start=1488821641399&locales=2579&categories=vystavki&tags=91"), parse_mode='Markdown')
-        bot.register_next_step_handler(next_step, process_step_2) 
+        make_first_answer(SCULPTURE_IDENTIFIER, chat_id)
     elif message.text==('Главное меню'):
         start(message)
     else:
         print("Unknown command")
 
-def check_server(url):
-    try:
-        r = requests.head(url)
-        statusCode = r.status_code
-    except requests.ConnectionError:
-        print("Failed to connect server")
 
-    if(statusCode == 200):
-        resp = urlopen(url).read().decode('utf8')
-        result = [resp, statusCode]
+#username = str(message.chat.username)
+#data = {'cat1': resp_cat1, 'cat2': resp_cat2, "username": username}
+#url_cat2 = urllib.request.urlopen("http://admin.theartr.ru/stat_backend/click?cat1=" + resp_cat1 + '&cat2=' + resp_cat2 + '&username=' + username)
 
-    else:
-        resp = 'Не удалось соедениться с сервером МинКульт'
-        result = [resp, statusCode]
-
-    return result
-
-def create_response(resp_cat1, resp_cat2, url, message):
-    resp = check_server(url)
-    if(resp[1] == 200):
-        events = json.loads(resp[0])
-        spisok_sobitiy = []
-        for event in events['events']:
-               spisok_sobitiy.append({'name': event['name'], 'place': event['places'], 'address': event['places'][0]['address'], 
-                  'price': event['price'], "shortDescription": event["shortDescription"], "url": event["externalInfo"][0]['url']})  
-        result = ''
-        for eventik in spisok_sobitiy[:5]:
-            if('name' in eventik):
-                name = '*' + eventik['name'] + '*' + '\n\n'
-            else:
-                name = ''
-
-            if('name' in eventik['place']):
-                place = 'Место проведения: ' + eventik['place'] + '\n\n'
-            else:
-                place = ''
-
-            if('source' in eventik['address']):
-                address = 'Адрес: ' + eventik['address']['source'] + '\n\n'
-            else:
-                address = ''
-
-            if("shortDescription" in eventik):
-                short_desc = 'Краткое описание: ' + eventik['shortDescription'] + '\n\n'
-            else:
-                short_desc = ''
-            if('url' in eventik):
-                show_url = 'Подробнее: ' + eventik['url'] + '\n\n'
-            else:
-                show_url = ''
-
-            result += name + place + address + short_desc + show_url + '\n\n'
-
-
-    else:
-        result = resp[0]
-
-    username = str(message.chat.username)
-    data = {'cat1': resp_cat1, 'cat2': resp_cat2, "username": username}
-    #url_cat2 = urllib.request.urlopen("http://admin.theartr.ru/stat_backend/click?cat1=" + resp_cat1 + '&cat2=' + resp_cat2 + '&username=' + username)
-    # TODO
-    return
+# use that function to make first message
+# after that will used @callback_query_handler
+def make_first_answer(source_identifier, chat_id):
+    # TODO: check MinCult connection
+    # TODO: statistics for category1 category2
+    # TODO: button 'back'(main menu, prev_page, etc)
+    print('received source_identifier {}'.format(source_identifier))
+    # prepare data for source_identifier
+    event_url = get_url_for_identifier(source_identifier)
+    events_list = get_getter_for_identifier(source_identifier)(event_url)
+    text = get_slicer_for_identifier(source_identifier)(events_list, 0, PAGE_STEP)
+    # send data to user
+    bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown',
+            reply_markup=make_inline_buttons(0, PAGE_STEP, len(events_list), source_identifier))
 
 
 if __name__ == "__main__":
+    initialize()
     bot.remove_webhook()
     bot.polling()
