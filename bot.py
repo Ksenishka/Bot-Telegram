@@ -45,31 +45,34 @@ def get_cat2_for_identifier(source_identifier):
 def initialize():
     add_row_to_event_info(FILMS_IDENTIFIER, FILMS_URL, get_list_of_events, get_slice_of_events, "Film_screening")
     add_row_to_event_info(LECTURES_IDENTIFIER, LECTURES_URL, get_list_of_events, get_slice_of_events, "Lectures")
-    # Spektakli
-    #add_row_to_event_info(TRAGICOMEDY_IDENTIFIER, TRAGICOMEDY_URL, get_list_of_events, get_slice_of_events)
-    #add_row_to_event_info(MODERN_ART_IDENTIFIER, MODERN_ART_URL, get_list_of_events, get_slice_of_events)
-    #add_row_to_event_info(CLASSIC_ART_IDENTIFIER, CLASSIC_ART_URL, get_list_of_events, get_slice_of_events)
-    #add_row_to_event_info(DRAMA_IDENTIFIER, DRAMA_URL, get_list_of_events, get_slice_of_events)
-    #add_row_to_event_info(COMEDY_IDENTIFIER, COMEDY_URL, get_list_of_events, get_slice_of_events)
-    #add_row_to_event_info(BALLET_IDENTIFIER, BALLET_URL, get_list_of_events, get_slice_of_events)
-    #add_row_to_event_info(MONOSPECT_IDENTIFIER, MONOSPECT_URL, get_list_of_events, get_slice_of_events)
-    #add_row_to_event_info(EXP_THEATRE_IDENTIFIER, EXP_THEATRE_URL, get_list_of_events, get_slice_of_events)
-    #add_row_to_event_info(PUPPET_SHOW_IDENTIFIER, PUPPET_SHOW_URL, get_list_of_events, get_slice_of_events)
-    #add_row_to_event_info(FOLKLORE_IDENTIFIER, FOLKLORE_URL, get_list_of_events, get_slice_of_events)
-    # Koncerty
+    
+    # Performances
+    add_row_to_event_info(TRAGICOMEDY_IDENTIFIER, TRAGICOMEDY_URL, get_list_of_events, get_slice_of_events, "Performances", "Tragicomedy")
+    add_row_to_event_info(MODERN_ART_IDENTIFIER, MODERN_ART_URL, get_list_of_events, get_slice_of_events, "Performances", "Modern art")
+    add_row_to_event_info(CLASSIC_ART_IDENTIFIER, CLASSIC_ART_URL, get_list_of_events, get_slice_of_events, "Performances", "Classic art")
+    add_row_to_event_info(DRAMA_IDENTIFIER, DRAMA_URL, get_list_of_events, get_slice_of_events, "Performances", "Drama")
+    add_row_to_event_info(COMEDY_IDENTIFIER, COMEDY_URL, get_list_of_events, get_slice_of_events, "Performances", "Comedy")
+    add_row_to_event_info(BALLET_IDENTIFIER, BALLET_URL, get_list_of_events, get_slice_of_events, "Performances", "Ballet")
+    add_row_to_event_info(MONOSPECT_IDENTIFIER, MONOSPECT_URL, get_list_of_events, get_slice_of_events, "Performances", "Monospect")
+    add_row_to_event_info(EXP_THEATRE_IDENTIFIER, EXP_THEATRE_URL, get_list_of_events, get_slice_of_events, "Performances", "Experiemental theatre")
+    add_row_to_event_info(PUPPET_SHOW_IDENTIFIER, PUPPET_SHOW_URL, get_list_of_events, get_slice_of_events, "Performances", "Puppet show")
+    add_row_to_event_info(FOLKLORE_IDENTIFIER, FOLKLORE_URL, get_list_of_events, get_slice_of_events, "Performances", "Folklore")
+    
+    # Concerts
     add_row_to_event_info(OPERA_IDENTIFIER, OPERA_URL, get_list_of_events, get_slice_of_events, "Concerts", "Opera")
-    #add_row_to_event_info(CLASSIC_MUSIC_IDENTIFIER, CLASSIC_MUSIC_URL, get_list_of_events, get_slice_of_events)
-    #add_row_to_event_info(FOLKLORE_MUSIC_IDENTIFIER, FOLKLORE_MUSIC_URL, get_list_of_events, get_slice_of_events)
-    #add_row_to_event_info(JAZZ_IDENTIFIER, JAZZ_URL, get_list_of_events, get_slice_of_events)
-    #add_row_to_event_info(ORGAN_MUSIC_IDENTIFIER, ORGAN_MUSIC_URL, get_list_of_events, get_slice_of_events)
-    #add_row_to_event_info(AUTHOR_SONG_IDENTIFIER, AUTHOR_SONG_URL, get_list_of_events, get_slice_of_events)
-    # Vystavki
-    #add_row_to_event_info(MODERN_ART_EXHIBIT_IDENTIFIER, MODERN_ART_EXHIBIT_URL, get_list_of_events, get_slice_of_events)
-    #add_row_to_event_info(PHOTO_IDENTIFIER, PHOTO_URL, get_list_of_events, get_slice_of_events)
-    #add_row_to_event_info(GRAPHIC_IDENTIFIER, GRAPHIC_URL, get_list_of_events, get_slice_of_events)
-    #add_row_to_event_info(PAINTING_IDENTIFIER, PAINTING_URL, get_list_of_events, get_slice_of_events)
-    #add_row_to_event_info(DESIGN_IDENTIFIER, DESIGN_URL, get_list_of_events, get_slice_of_events)
-    #add_row_to_event_info(SCULPTURE_IDENTIFIER, SCULPTURE_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(CLASSIC_MUSIC_IDENTIFIER, CLASSIC_MUSIC_URL, get_list_of_events, get_slice_of_events, "Concerts", "Classical music")
+    add_row_to_event_info(FOLKLORE_MUSIC_IDENTIFIER, FOLKLORE_MUSIC_URL, get_list_of_events, get_slice_of_events, "Concerts", "Folklore music")
+    add_row_to_event_info(JAZZ_IDENTIFIER, JAZZ_URL, get_list_of_events, get_slice_of_events, "Concerts", "Jazz")
+    add_row_to_event_info(ORGAN_MUSIC_IDENTIFIER, ORGAN_MUSIC_URL, get_list_of_events, get_slice_of_events, "Concerts", "Organ music")
+    add_row_to_event_info(AUTHOR_SONG_IDENTIFIER, AUTHOR_SONG_URL, get_list_of_events, get_slice_of_events, "Concerts", "Author song")
+    
+    # Exhibitions
+    add_row_to_event_info(MODERN_ART_EXHIBIT_IDENTIFIER, MODERN_ART_EXHIBIT_URL, get_list_of_events, get_slice_of_events, "Exhibitions", "Modern art")
+    add_row_to_event_info(PHOTO_IDENTIFIER, PHOTO_URL, get_list_of_events, get_slice_of_events, "Exhibitions", "Photo")
+    add_row_to_event_info(GRAPHIC_IDENTIFIER, GRAPHIC_URL, get_list_of_events, get_slice_of_events, "Exhibitions", "Graphic")
+    add_row_to_event_info(PAINTING_IDENTIFIER, PAINTING_URL, get_list_of_events, get_slice_of_events, "Exhibitions", "Painting")
+    add_row_to_event_info(DESIGN_IDENTIFIER, DESIGN_URL, get_list_of_events, get_slice_of_events, "Exhibitions", "Design")
+    add_row_to_event_info(SCULPTURE_IDENTIFIER, SCULPTURE_URL, get_list_of_events, get_slice_of_events, "Exhibitions", "Sculpture")
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -167,6 +170,7 @@ def process_main_step(message):
     username = message.chat.username
 
     if message.text=='Спектакли \U0001F3AD':
+        stats_user_click(username, "Performances")
         print('Performances')
 
         markup = types.ReplyKeyboardMarkup()
@@ -266,52 +270,76 @@ def process_step_2(message):
     chat_id = message.chat.id
     username = message.chat.username
 
-    if message.text==("Трагикомедия"):
-        make_first_answer(TRAGICOMEDY_IDENTIFIER, chat_id, process_step_2)
     # this is performance
+    if message.text==("Трагикомедия"):
+        stats_user_click(username, get_cat1_for_identifier(TRAGICOMEDY_IDENTIFIER), get_cat2_for_identifier(TRAGICOMEDY_IDENTIFIER))
+        make_first_answer(TRAGICOMEDY_IDENTIFIER, chat_id, process_step_2)
     elif message.text==("Современное искусство"):
+        stats_user_click(username, get_cat1_for_identifier(MODERN_ART_IDENTIFIER), get_cat2_for_identifier(MODERN_ART_IDENTIFIER))
         make_first_answer(MODERN_ART_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Классическое искусство'):
+        stats_user_click(username, get_cat1_for_identifier(CLASSIC_ART_IDENTIFIER), get_cat2_for_identifier(CLASSIC_ART_IDENTIFIER))
         make_first_answer(CLASSIC_ART_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Драма'):
+        stats_user_click(username, get_cat1_for_identifier(DRAMA_IDENTIFIER), get_cat2_for_identifier(DRAMA_IDENTIFIER))
         make_first_answer(DRAMA_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Комедия'):
+        stats_user_click(username, get_cat1_for_identifier(COMEDY_IDENTIFIER), get_cat2_for_identifier(COMEDY_IDENTIFIER))
         make_first_answer(COMEDY_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Балет'):
+        stats_user_click(username, get_cat1_for_identifier(BALLET_IDENTIFIER), get_cat2_for_identifier(BALLET_IDENTIFIER))
         make_first_answer(BALLET_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Моноспектакль'):
+        stats_user_click(username, get_cat1_for_identifier(MONOSPECT_IDENTIFIER), get_cat2_for_identifier(MONOSPECT_IDENTIFIER))
         make_first_answer(MONOSPECT_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Эксперементальный театр'):
+        stats_user_click(username, get_cat1_for_identifier(EXP_THEATRE_IDENTIFIER), get_cat2_for_identifier(EXP_THEATRE_IDENTIFIER))
         make_first_answer(EXP_THEATRE_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Кукольный спектакль'):
+        stats_user_click(username, get_cat1_for_identifier(PUPPET_SHOW_IDENTIFIER), get_cat2_for_identifier(PUPPET_SHOW_IDENTIFIER))
         make_first_answer(PUPPET_SHOW_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Фольклор'):
+        stats_user_click(username, get_cat1_for_identifier(FOLKLORE_IDENTIFIER), get_cat2_for_identifier(FOLKLORE_IDENTIFIER))
         make_first_answer(FOLKLORE_IDENTIFIER, chat_id, process_step_2)
+        
+    # this is concert
     elif message.text==('Опера'):
         stats_user_click(username, get_cat1_for_identifier(OPERA_IDENTIFIER), get_cat2_for_identifier(OPERA_IDENTIFIER))
         make_first_answer(OPERA_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Классическая музыка'):
+        stats_user_click(username, get_cat1_for_identifier(CLASSIC_MUSIC_IDENTIFIER), get_cat2_for_identifier(CLASSIC_MUSIC_IDENTIFIER))
         make_first_answer(CLASSIC_MUSIC_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Фольклорная музыка'):
+        stats_user_click(username, get_cat1_for_identifier(FOLKLORE_MUSIC_IDENTIFIER), get_cat2_for_identifier(FOLKLORE_MUSIC_IDENTIFIER))
         make_first_answer(FOLKLORE_MUSIC_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Джаз'):
+        stats_user_click(username, get_cat1_for_identifier(JAZZ_IDENTIFIER), get_cat2_for_identifier(JAZZ_IDENTIFIER))
         make_first_answer(JAZZ_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Органная музыка'):
+        stats_user_click(username, get_cat1_for_identifier(ORGAN_MUSIC_IDENTIFIER), get_cat2_for_identifier(ORGAN_MUSIC_IDENTIFIER))
         make_first_answer(ORGAN_MUSIC_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Авторская песня'):
+        stats_user_click(username, get_cat1_for_identifier(AUTHOR_SONG_IDENTIFIER), get_cat2_for_identifier(AUTHOR_SONG_IDENTIFIER))
         make_first_answer(AUTHOR_SONG_IDENTIFIER, chat_id, process_step_2)
+        
     # this is exhibition
     elif message.text==('Современное Искусство'):
+        stats_user_click(username, get_cat1_for_identifier(MODERN_ART_EXHIBIT_IDENTIFIER), get_cat2_for_identifier(MODERN_ART_EXHIBIT_IDENTIFIER))
         make_first_answer(MODERN_ART_EXHIBIT_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Фотография'):
+        stats_user_click(username, get_cat1_for_identifier(PHOTO_IDENTIFIER), get_cat2_for_identifier(PHOTO_IDENTIFIER))
         make_first_answer(PHOTO_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Графика'):
+        stats_user_click(username, get_cat1_for_identifier(GRAPHIC_IDENTIFIER), get_cat2_for_identifier(GRAPHIC_IDENTIFIER))
         make_first_answer(GRAPHIC_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Живопись'):
+        stats_user_click(username, get_cat1_for_identifier(PAINTING_IDENTIFIER), get_cat2_for_identifier(PAINTING_IDENTIFIER))
         make_first_answer(PAINTING_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Дизайн'):
+        stats_user_click(username, get_cat1_for_identifier(DESIGN_IDENTIFIER), get_cat2_for_identifier(DESIGN_IDENTIFIER))
         make_first_answer(DESIGN_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Скульптура'):
+        stats_user_click(username, get_cat1_for_identifier(SCULPTURE_IDENTIFIER), get_cat2_for_identifier(SCULPTURE_IDENTIFIER))
         make_first_answer(SCULPTURE_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Главное меню'):
         start(message)
