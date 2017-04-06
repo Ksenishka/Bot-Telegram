@@ -6,7 +6,7 @@ def stats_user_connected(username):
     do_urlopen(url)
 
 def stats_user_click(username, cat1, cat2=None):
-    url = "click?username={}&cat1={}".format(username, cat1)
+    url = "{}click?username={}&cat1={}".format(STATS_URL, username, cat1)
     if cat2 != None:
         url += "&cat2={}".format(cat2)
     do_urlopen(url)
