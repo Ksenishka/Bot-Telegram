@@ -12,39 +12,14 @@ from defines import *
 
 bot = telebot.TeleBot(BOT_TOKEN)
 # this dictionary has key=source_identifier and value=list where
-# list contains 3 elements: source_url, getter_function (use to load data from MinCult)
-# and slicer funciton (use to slice some data)
+# list contains 3 elements:
+# - source_url
+# - getter_function (use to load data from MinCult)
+# - slicer funciton (use to slice some data)
 events_info = {}
 
-
-def initialize():
-    events_info[FILMS_IDENTIFIER] = [FILMS_URL, get_list_of_events, get_slice_of_events]
-    events_info[LECTURES_IDENTIFIER] = [LECTURES_URL, get_list_of_events, get_slice_of_events]
-    # Spektakli
-    events_info[TRAGICOMEDY_IDENTIFIER] = [TRAGICOMEDY_URL, get_list_of_events, get_slice_of_events]
-    events_info[MODERN_ART_IDENTIFIER] = [MODERN_ART_URL, get_list_of_events, get_slice_of_events]
-    events_info[CLASSIC_ART_IDENTIFIER] = [CLASSIC_ART_URL, get_list_of_events, get_slice_of_events]
-    events_info[DRAMA_IDENTIFIER] = [DRAMA_URL, get_list_of_events, get_slice_of_events]
-    events_info[COMEDY_IDENTIFIER] = [COMEDY_URL, get_list_of_events, get_slice_of_events]
-    events_info[BALLET_IDENTIFIER] = [BALLET_URL, get_list_of_events, get_slice_of_events]
-    events_info[MONOSPECT_IDENTIFIER] = [MONOSPECT_URL, get_list_of_events, get_slice_of_events]
-    events_info[EXP_THEATRE_IDENTIFIER] = [EXP_THEATRE_URL, get_list_of_events, get_slice_of_events]
-    events_info[PUPPET_SHOW_IDENTIFIER] = [PUPPET_SHOW_URL, get_list_of_events, get_slice_of_events]
-    events_info[FOLKLORE_IDENTIFIER] = [FOLKLORE_URL, get_list_of_events, get_slice_of_events]
-    # Koncerty
-    events_info[OPERA_IDENTIFIER] = [OPERA_URL, get_list_of_events, get_slice_of_events]
-    events_info[CLASSIC_MUSIC_IDENTIFIER] = [CLASSIC_MUSIC_URL, get_list_of_events, get_slice_of_events]
-    events_info[FOLKLORE_MUSIC_IDENTIFIER] = [FOLKLORE_MUSIC_URL, get_list_of_events, get_slice_of_events]
-    events_info[JAZZ_IDENTIFIER] = [JAZZ_URL, get_list_of_events, get_slice_of_events]
-    events_info[ORGAN_MUSIC_IDENTIFIER] = [ORGAN_MUSIC_URL, get_list_of_events, get_slice_of_events]
-    events_info[AUTHOR_SONG_IDENTIFIER] = [AUTHOR_SONG_URL, get_list_of_events, get_slice_of_events]
-    # Vystavki
-    events_info[MODERN_ART_EXHIBIT_IDENTIFIER] = [MODERN_ART_EXHIBIT_URL, get_list_of_events, get_slice_of_events]
-    events_info[PHOTO_IDENTIFIER] = [PHOTO_URL, get_list_of_events, get_slice_of_events]
-    events_info[GRAPHIC_IDENTIFIER] = [GRAPHIC_URL, get_list_of_events, get_slice_of_events]
-    events_info[PAINTING_IDENTIFIER] = [PAINTING_URL, get_list_of_events, get_slice_of_events]
-    events_info[DESIGN_IDENTIFIER] = [DESIGN_URL, get_list_of_events, get_slice_of_events]
-    events_info[SCULPTURE_IDENTIFIER] = [SCULPTURE_URL, get_list_of_events, get_slice_of_events]
+def add_row_to_event_info(identifier, url, getter, slicer):
+    events_info[identifier] = [url, getter, slicer]
 
 def get_url_for_identifier(source_identifier):
     return events_info[source_identifier][0]
@@ -54,6 +29,35 @@ def get_getter_for_identifier(source_identifier):
 
 def get_slicer_for_identifier(source_identifier):
     return events_info[source_identifier][2]
+
+def initialize():
+    add_row_to_event_info(FILMS_IDENTIFIER, FILMS_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(LECTURES_IDENTIFIER, LECTURES_URL, get_list_of_events, get_slice_of_events)
+    # Spektakli
+    add_row_to_event_info(TRAGICOMEDY_IDENTIFIER, TRAGICOMEDY_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(MODERN_ART_IDENTIFIER, MODERN_ART_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(CLASSIC_ART_IDENTIFIER, CLASSIC_ART_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(DRAMA_IDENTIFIER, DRAMA_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(COMEDY_IDENTIFIER, COMEDY_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(BALLET_IDENTIFIER, BALLET_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(MONOSPECT_IDENTIFIER, MONOSPECT_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(EXP_THEATRE_IDENTIFIER, EXP_THEATRE_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(PUPPET_SHOW_IDENTIFIER, PUPPET_SHOW_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(FOLKLORE_IDENTIFIER, FOLKLORE_URL, get_list_of_events, get_slice_of_events)
+    # Koncerty
+    add_row_to_event_info(OPERA_IDENTIFIER, OPERA_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(CLASSIC_MUSIC_IDENTIFIER, CLASSIC_MUSIC_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(FOLKLORE_MUSIC_IDENTIFIER, FOLKLORE_MUSIC_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(JAZZ_IDENTIFIER, JAZZ_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(ORGAN_MUSIC_IDENTIFIER, ORGAN_MUSIC_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(AUTHOR_SONG_IDENTIFIER, AUTHOR_SONG_URL, get_list_of_events, get_slice_of_events)
+    # Vystavki
+    add_row_to_event_info(MODERN_ART_EXHIBIT_IDENTIFIER, MODERN_ART_EXHIBIT_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(PHOTO_IDENTIFIER, PHOTO_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(GRAPHIC_IDENTIFIER, GRAPHIC_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(PAINTING_IDENTIFIER, PAINTING_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(DESIGN_IDENTIFIER, DESIGN_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(SCULPTURE_IDENTIFIER, SCULPTURE_URL, get_list_of_events, get_slice_of_events)
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -193,12 +197,12 @@ def process_main_step(message):
     elif message.text==('Кинопоказ \U0001F4FA'):
         #url_cat2 = urllib.request.urlopen('http://admin.theartr.ru/stat_backend/click?cat1=Film_screening&username=' + message.chat.username)
         print('Film screening')
-        make_first_answer(FILMS_IDENTIFIER, chat_id)
+        make_first_answer(FILMS_IDENTIFIER, chat_id, process_main_step)
 
     elif message.text==('Лекции \U0001F4DA'):
         #url_cat2 = urllib.request.urlopen('http://admin.theartr.ru/stat_backend/click?cat1=Lectures&username=' + message.chat.username)
         print('Lectures')
-        make_first_answer(LECTURES_IDENTIFIER, chat_id)
+        make_first_answer(LECTURES_IDENTIFIER, chat_id, process_main_step)
 
     elif message.text=='Концерты \U0001F3BC':
         #url_cat2 = urllib.request.urlopen('http://admin.theartr.ru/stat_backend/click?cat1=Concerts&username=' + message.chat.username)
@@ -257,51 +261,51 @@ def process_step_2(message):
     chat_id = message.chat.id
 
     if message.text==("Трагикомедия"):
-        make_first_answer(TRAGICOMEDY_IDENTIFIER, chat_id)
+        make_first_answer(TRAGICOMEDY_IDENTIFIER, chat_id, process_step_2)
     # this is performance
     elif message.text==("Современное искусство"):
-        make_first_answer(MODERN_ART_IDENTIFIER, chat_id)
+        make_first_answer(MODERN_ART_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Классическое искусство'):
-        make_first_answer(CLASSIC_ART_IDENTIFIER, chat_id)
+        make_first_answer(CLASSIC_ART_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Драма'):
-        make_first_answer(DRAMA_IDENTIFIER, chat_id)
+        make_first_answer(DRAMA_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Комедия'):
-        make_first_answer(COMEDY_IDENTIFIER, chat_id)
+        make_first_answer(COMEDY_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Балет'):
-        make_first_answer(BALLET_IDENTIFIER, chat_id)
+        make_first_answer(BALLET_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Моноспектакль'):
-        make_first_answer(MONOSPECT_IDENTIFIER, chat_id)
+        make_first_answer(MONOSPECT_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Эксперементальный театр'):
-        make_first_answer(EXP_THEATRE_IDENTIFIER, chat_id)
+        make_first_answer(EXP_THEATRE_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Кукольный спектакль'):
-        make_first_answer(PUPPET_SHOW_IDENTIFIER, chat_id)
+        make_first_answer(PUPPET_SHOW_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Фольклор'):
-        make_first_answer(FOLKLORE_IDENTIFIER, chat_id)
+        make_first_answer(FOLKLORE_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Опера'):
-        make_first_answer(OPERA_IDENTIFIER, chat_id)
+        make_first_answer(OPERA_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Классическая музыка'):
-        make_first_answer(CLASSIC_MUSIC_IDENTIFIER, chat_id)
+        make_first_answer(CLASSIC_MUSIC_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Фольклорная музыка'):
-        make_first_answer(FOLKLORE_MUSIC_IDENTIFIER, chat_id)
+        make_first_answer(FOLKLORE_MUSIC_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Джаз'):
-        make_first_answer(JAZZ_IDENTIFIER, chat_id)
+        make_first_answer(JAZZ_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Органная музыка'):
-        make_first_answer(ORGAN_MUSIC_IDENTIFIER, chat_id)
+        make_first_answer(ORGAN_MUSIC_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Авторская песня'):
-        make_first_answer(AUTHOR_SONG_IDENTIFIER, chat_id)
+        make_first_answer(AUTHOR_SONG_IDENTIFIER, chat_id, process_step_2)
     # this is exhibition
     elif message.text==('Современное Искусство'):
-        make_first_answer(MODERN_ART_EXHIBIT_IDENTIFIER, chat_id)
+        make_first_answer(MODERN_ART_EXHIBIT_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Фотография'):
-        make_first_answer(PHOTO_IDENTIFIER, chat_id)
+        make_first_answer(PHOTO_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Графика'):
-        make_first_answer(GRAPHIC_IDENTIFIER, chat_id)
+        make_first_answer(GRAPHIC_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Живопись'):
-        make_first_answer(PAINTING_IDENTIFIER, chat_id)
+        make_first_answer(PAINTING_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Дизайн'):
-        make_first_answer(DESIGN_IDENTIFIER, chat_id)
+        make_first_answer(DESIGN_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Скульптура'):
-        make_first_answer(SCULPTURE_IDENTIFIER, chat_id)
+        make_first_answer(SCULPTURE_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Главное меню'):
         start(message)
     else:
@@ -314,7 +318,7 @@ def process_step_2(message):
 
 # use that function to make first message
 # after that will used @callback_query_handler
-def make_first_answer(source_identifier, chat_id):
+def make_first_answer(source_identifier, chat_id, handler):
     # TODO: check MinCult connection
     # TODO: statistics for category1 category2
     # TODO: button 'back'(main menu, prev_page, etc)
@@ -324,8 +328,9 @@ def make_first_answer(source_identifier, chat_id):
     events_list = get_getter_for_identifier(source_identifier)(event_url)
     text = get_slicer_for_identifier(source_identifier)(events_list, 0, PAGE_STEP)
     # send data to user
-    bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown',
+    next_step = bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown',
             reply_markup=make_inline_buttons(0, PAGE_STEP, len(events_list), source_identifier))
+    bot.register_next_step_handler(next_step, handler)
 
 
 if __name__ == "__main__":
