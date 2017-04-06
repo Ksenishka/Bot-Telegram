@@ -2,24 +2,30 @@
 
 import telebot
 from telebot import types
+
 import json
-from urllib.request import urlopen
 import requests
 import urllib.request
 import urllib.parse
+from urllib.request import urlopen
+
 from defines import *
+from stats import stats_user_connected
+from stats import stats_user_click
 
 
 bot = telebot.TeleBot(BOT_TOKEN)
 # this dictionary has key=source_identifier and value=list where
-# list contains 3 elements:
+# list contains 5 elements:
 # - source_url
 # - getter_function (use to load data from MinCult)
 # - slicer funciton (use to slice some data)
+# - category 1 (required)
+# - category 2 (optional)
 events_info = {}
 
-def add_row_to_event_info(identifier, url, getter, slicer):
-    events_info[identifier] = [url, getter, slicer]
+def add_row_to_event_info(identifier, url, getter, slicer, cat1, cat2=None):
+    events_info[identifier] = [url, getter, slicer, cat1, cat2]
 
 def get_url_for_identifier(source_identifier):
     return events_info[source_identifier][0]
@@ -30,34 +36,40 @@ def get_getter_for_identifier(source_identifier):
 def get_slicer_for_identifier(source_identifier):
     return events_info[source_identifier][2]
 
+def get_cat1_for_identifier(source_identifier):
+    return events_info[source_identifier][3]
+
+def get_cat2_for_identifier(source_identifier):
+    return events_info[source_identifier][4]
+
 def initialize():
-    add_row_to_event_info(FILMS_IDENTIFIER, FILMS_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(LECTURES_IDENTIFIER, LECTURES_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(FILMS_IDENTIFIER, FILMS_URL, get_list_of_events, get_slice_of_events, "Film_screening")
+    add_row_to_event_info(LECTURES_IDENTIFIER, LECTURES_URL, get_list_of_events, get_slice_of_events, "Lectures")
     # Spektakli
-    add_row_to_event_info(TRAGICOMEDY_IDENTIFIER, TRAGICOMEDY_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(MODERN_ART_IDENTIFIER, MODERN_ART_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(CLASSIC_ART_IDENTIFIER, CLASSIC_ART_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(DRAMA_IDENTIFIER, DRAMA_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(COMEDY_IDENTIFIER, COMEDY_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(BALLET_IDENTIFIER, BALLET_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(MONOSPECT_IDENTIFIER, MONOSPECT_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(EXP_THEATRE_IDENTIFIER, EXP_THEATRE_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(PUPPET_SHOW_IDENTIFIER, PUPPET_SHOW_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(FOLKLORE_IDENTIFIER, FOLKLORE_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(TRAGICOMEDY_IDENTIFIER, TRAGICOMEDY_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(MODERN_ART_IDENTIFIER, MODERN_ART_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(CLASSIC_ART_IDENTIFIER, CLASSIC_ART_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(DRAMA_IDENTIFIER, DRAMA_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(COMEDY_IDENTIFIER, COMEDY_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(BALLET_IDENTIFIER, BALLET_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(MONOSPECT_IDENTIFIER, MONOSPECT_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(EXP_THEATRE_IDENTIFIER, EXP_THEATRE_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(PUPPET_SHOW_IDENTIFIER, PUPPET_SHOW_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(FOLKLORE_IDENTIFIER, FOLKLORE_URL, get_list_of_events, get_slice_of_events)
     # Koncerty
-    add_row_to_event_info(OPERA_IDENTIFIER, OPERA_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(CLASSIC_MUSIC_IDENTIFIER, CLASSIC_MUSIC_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(FOLKLORE_MUSIC_IDENTIFIER, FOLKLORE_MUSIC_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(JAZZ_IDENTIFIER, JAZZ_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(ORGAN_MUSIC_IDENTIFIER, ORGAN_MUSIC_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(AUTHOR_SONG_IDENTIFIER, AUTHOR_SONG_URL, get_list_of_events, get_slice_of_events)
+    add_row_to_event_info(OPERA_IDENTIFIER, OPERA_URL, get_list_of_events, get_slice_of_events, "Concerts", "Opera")
+    #add_row_to_event_info(CLASSIC_MUSIC_IDENTIFIER, CLASSIC_MUSIC_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(FOLKLORE_MUSIC_IDENTIFIER, FOLKLORE_MUSIC_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(JAZZ_IDENTIFIER, JAZZ_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(ORGAN_MUSIC_IDENTIFIER, ORGAN_MUSIC_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(AUTHOR_SONG_IDENTIFIER, AUTHOR_SONG_URL, get_list_of_events, get_slice_of_events)
     # Vystavki
-    add_row_to_event_info(MODERN_ART_EXHIBIT_IDENTIFIER, MODERN_ART_EXHIBIT_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(PHOTO_IDENTIFIER, PHOTO_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(GRAPHIC_IDENTIFIER, GRAPHIC_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(PAINTING_IDENTIFIER, PAINTING_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(DESIGN_IDENTIFIER, DESIGN_URL, get_list_of_events, get_slice_of_events)
-    add_row_to_event_info(SCULPTURE_IDENTIFIER, SCULPTURE_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(MODERN_ART_EXHIBIT_IDENTIFIER, MODERN_ART_EXHIBIT_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(PHOTO_IDENTIFIER, PHOTO_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(GRAPHIC_IDENTIFIER, GRAPHIC_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(PAINTING_IDENTIFIER, PAINTING_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(DESIGN_IDENTIFIER, DESIGN_URL, get_list_of_events, get_slice_of_events)
+    #add_row_to_event_info(SCULPTURE_IDENTIFIER, SCULPTURE_URL, get_list_of_events, get_slice_of_events)
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -71,16 +83,7 @@ def start(message):
             'Выберете интересующее вас направление.',
             reply_markup=markup)
     bot.register_next_step_handler(next_step, process_main_step)
-
-    # Process stats
-    #username = message.chat.username
-    #print(username)
-    #send_stat = urllib.request.urlopen("http://admin.theartr.ru/stat_backend/user?username="+username + '&action=connected')
-    # GET запрос
-    #data = {"username": username, 'action': 'connected'}
-    #enc_data = urllib.parse.urlencode(data)
-    #url_connection = urllib.request.urlopen("http://admin.theartr.ru/stat_backend/user" + "?" + enc_data)
-    #print(url_connection.read())
+    stats_user_connected(message.chat.username)
 
 def get_list_of_events(url):
     resp = urlopen(url).read().decode('utf8')
@@ -161,6 +164,7 @@ def do_pagination(c):
 
 def process_main_step(message):
     chat_id = message.chat.id
+    username = message.chat.username
 
     if message.text=='Спектакли \U0001F3AD':
         print('Performances')
@@ -195,18 +199,19 @@ def process_main_step(message):
         bot.register_next_step_handler(next_step, process_step_2)
 
     elif message.text==('Кинопоказ \U0001F4FA'):
-        #url_cat2 = urllib.request.urlopen('http://admin.theartr.ru/stat_backend/click?cat1=Film_screening&username=' + message.chat.username)
         print('Film screening')
+        stats_user_click(username, get_cat1_for_identifier(FILMS_IDENTIFIER))
         make_first_answer(FILMS_IDENTIFIER, chat_id, process_main_step)
 
     elif message.text==('Лекции \U0001F4DA'):
-        #url_cat2 = urllib.request.urlopen('http://admin.theartr.ru/stat_backend/click?cat1=Lectures&username=' + message.chat.username)
         print('Lectures')
+        stats_user_click(username, get_cat1_for_identifier(LECTURES_IDENTIFIER))
         make_first_answer(LECTURES_IDENTIFIER, chat_id, process_main_step)
 
     elif message.text=='Концерты \U0001F3BC':
         #url_cat2 = urllib.request.urlopen('http://admin.theartr.ru/stat_backend/click?cat1=Concerts&username=' + message.chat.username)
         print('Concerts')
+        stats_user_click(username, "Concerts")
 
         markup = types.ReplyKeyboardMarkup()
         item1 = types.KeyboardButton("Опера")
@@ -259,6 +264,7 @@ def process_main_step(message):
 
 def process_step_2(message):
     chat_id = message.chat.id
+    username = message.chat.username
 
     if message.text==("Трагикомедия"):
         make_first_answer(TRAGICOMEDY_IDENTIFIER, chat_id, process_step_2)
@@ -282,6 +288,7 @@ def process_step_2(message):
     elif message.text==('Фольклор'):
         make_first_answer(FOLKLORE_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Опера'):
+        stats_user_click(username, get_cat1_for_identifier(OPERA_IDENTIFIER), get_cat2_for_identifier(OPERA_IDENTIFIER))
         make_first_answer(OPERA_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Классическая музыка'):
         make_first_answer(CLASSIC_MUSIC_IDENTIFIER, chat_id, process_step_2)
@@ -320,8 +327,6 @@ def process_step_2(message):
 # after that will used @callback_query_handler
 def make_first_answer(source_identifier, chat_id, handler):
     # TODO: check MinCult connection
-    # TODO: statistics for category1 category2
-    # TODO: button 'back'(main menu, prev_page, etc)
     print('received source_identifier {}'.format(source_identifier))
     # prepare data for source_identifier
     event_url = get_url_for_identifier(source_identifier)
