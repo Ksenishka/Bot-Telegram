@@ -48,12 +48,12 @@ def initialize():
     # Performances
     add_row_to_event_info(TRAGICOMEDY_IDENTIFIER, TRAGICOMEDY_URL, get_list_of_events, get_slice_of_events, "Performances", "Tragicomedy")
     add_row_to_event_info(MODERN_ART_IDENTIFIER, MODERN_ART_URL, get_list_of_events, get_slice_of_events, "Performances", "Modern_art")
-    add_row_to_event_info(CLASSIC_ART_IDENTIFIER, CLASSIC_ART_URL, get_list_of_events, get_slice_of_events, "Performances", "Classic_art")
+    add_row_to_event_info(CLASSIC_ART_IDENTIFIER, CLASSIC_ART_URL, get_list_of_events, get_slice_of_events, "Performances", "Classical_art")
     add_row_to_event_info(DRAMA_IDENTIFIER, DRAMA_URL, get_list_of_events, get_slice_of_events, "Performances", "Drama")
     add_row_to_event_info(COMEDY_IDENTIFIER, COMEDY_URL, get_list_of_events, get_slice_of_events, "Performances", "Comedy")
     add_row_to_event_info(BALLET_IDENTIFIER, BALLET_URL, get_list_of_events, get_slice_of_events, "Performances", "Ballet")
     add_row_to_event_info(MONOSPECT_IDENTIFIER, MONOSPECT_URL, get_list_of_events, get_slice_of_events, "Performances", "Monospect")
-    add_row_to_event_info(EXP_THEATRE_IDENTIFIER, EXP_THEATRE_URL, get_list_of_events, get_slice_of_events, "Performances", "Experiemental_theatre")
+    add_row_to_event_info(EXP_THEATRE_IDENTIFIER, EXP_THEATRE_URL, get_list_of_events, get_slice_of_events, "Performances", "Experimental_theatre")
     add_row_to_event_info(PUPPET_SHOW_IDENTIFIER, PUPPET_SHOW_URL, get_list_of_events, get_slice_of_events, "Performances", "Puppet_show")
     add_row_to_event_info(FOLKLORE_IDENTIFIER, FOLKLORE_URL, get_list_of_events, get_slice_of_events, "Performances", "Folklore")
 
@@ -66,7 +66,7 @@ def initialize():
     add_row_to_event_info(AUTHOR_SONG_IDENTIFIER, AUTHOR_SONG_URL, get_list_of_events, get_slice_of_events, "Concerts", "Author_song")
 
     # Exhibitions
-    add_row_to_event_info(MODERN_ART_EXHIBIT_IDENTIFIER, MODERN_ART_EXHIBIT_URL, get_list_of_events, get_slice_of_events, "Exhibitions", "Modern_art")
+    add_row_to_event_info(MODERN_ART_EXHIBIT_IDENTIFIER, MODERN_ART_EXHIBIT_URL, get_list_of_events, get_slice_of_events, "Exhibitions", "Modern_art_exhibit")
     add_row_to_event_info(PHOTO_IDENTIFIER, PHOTO_URL, get_list_of_events, get_slice_of_events, "Exhibitions", "Photo")
     add_row_to_event_info(GRAPHIC_IDENTIFIER, GRAPHIC_URL, get_list_of_events, get_slice_of_events, "Exhibitions", "Graphic")
     add_row_to_event_info(PAINTING_IDENTIFIER, PAINTING_URL, get_list_of_events, get_slice_of_events, "Exhibitions", "Painting")
