@@ -7,12 +7,14 @@ def stats_user_connected(username):
 
 def stats_user_click(username, cat1, cat2=None):
     url = "{}click?username={}&cat1={}".format(STATS_URL, username, cat1)
-    if cat2 != None:
+    if cat2:
         url += "&cat2={}".format(cat2)
     do_urlopen(url)
 
 def do_urlopen(url):
     try:
-        urllib.urlopen(url)
+        resp = urlopen(url)
+        return resp
     except:
         print("urlopen() for url={} failed".format(url))
+        return None

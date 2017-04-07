@@ -10,8 +10,7 @@ import urllib.parse
 from urllib.request import urlopen
 
 from defines import *
-from stats import stats_user_connected
-from stats import stats_user_click
+from stats import *
 
 
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -45,29 +44,29 @@ def get_cat2_for_identifier(source_identifier):
 def initialize():
     add_row_to_event_info(FILMS_IDENTIFIER, FILMS_URL, get_list_of_events, get_slice_of_events, "Film_screening")
     add_row_to_event_info(LECTURES_IDENTIFIER, LECTURES_URL, get_list_of_events, get_slice_of_events, "Lectures")
-    
+
     # Performances
     add_row_to_event_info(TRAGICOMEDY_IDENTIFIER, TRAGICOMEDY_URL, get_list_of_events, get_slice_of_events, "Performances", "Tragicomedy")
-    add_row_to_event_info(MODERN_ART_IDENTIFIER, MODERN_ART_URL, get_list_of_events, get_slice_of_events, "Performances", "Modern art")
-    add_row_to_event_info(CLASSIC_ART_IDENTIFIER, CLASSIC_ART_URL, get_list_of_events, get_slice_of_events, "Performances", "Classic art")
+    add_row_to_event_info(MODERN_ART_IDENTIFIER, MODERN_ART_URL, get_list_of_events, get_slice_of_events, "Performances", "Modern_art")
+    add_row_to_event_info(CLASSIC_ART_IDENTIFIER, CLASSIC_ART_URL, get_list_of_events, get_slice_of_events, "Performances", "Classic_art")
     add_row_to_event_info(DRAMA_IDENTIFIER, DRAMA_URL, get_list_of_events, get_slice_of_events, "Performances", "Drama")
     add_row_to_event_info(COMEDY_IDENTIFIER, COMEDY_URL, get_list_of_events, get_slice_of_events, "Performances", "Comedy")
     add_row_to_event_info(BALLET_IDENTIFIER, BALLET_URL, get_list_of_events, get_slice_of_events, "Performances", "Ballet")
     add_row_to_event_info(MONOSPECT_IDENTIFIER, MONOSPECT_URL, get_list_of_events, get_slice_of_events, "Performances", "Monospect")
-    add_row_to_event_info(EXP_THEATRE_IDENTIFIER, EXP_THEATRE_URL, get_list_of_events, get_slice_of_events, "Performances", "Experiemental theatre")
-    add_row_to_event_info(PUPPET_SHOW_IDENTIFIER, PUPPET_SHOW_URL, get_list_of_events, get_slice_of_events, "Performances", "Puppet show")
+    add_row_to_event_info(EXP_THEATRE_IDENTIFIER, EXP_THEATRE_URL, get_list_of_events, get_slice_of_events, "Performances", "Experiemental_theatre")
+    add_row_to_event_info(PUPPET_SHOW_IDENTIFIER, PUPPET_SHOW_URL, get_list_of_events, get_slice_of_events, "Performances", "Puppet_show")
     add_row_to_event_info(FOLKLORE_IDENTIFIER, FOLKLORE_URL, get_list_of_events, get_slice_of_events, "Performances", "Folklore")
-    
+
     # Concerts
     add_row_to_event_info(OPERA_IDENTIFIER, OPERA_URL, get_list_of_events, get_slice_of_events, "Concerts", "Opera")
-    add_row_to_event_info(CLASSIC_MUSIC_IDENTIFIER, CLASSIC_MUSIC_URL, get_list_of_events, get_slice_of_events, "Concerts", "Classical music")
-    add_row_to_event_info(FOLKLORE_MUSIC_IDENTIFIER, FOLKLORE_MUSIC_URL, get_list_of_events, get_slice_of_events, "Concerts", "Folklore music")
+    add_row_to_event_info(CLASSIC_MUSIC_IDENTIFIER, CLASSIC_MUSIC_URL, get_list_of_events, get_slice_of_events, "Concerts", "Classical_music")
+    add_row_to_event_info(FOLKLORE_MUSIC_IDENTIFIER, FOLKLORE_MUSIC_URL, get_list_of_events, get_slice_of_events, "Concerts", "Folklore_music")
     add_row_to_event_info(JAZZ_IDENTIFIER, JAZZ_URL, get_list_of_events, get_slice_of_events, "Concerts", "Jazz")
-    add_row_to_event_info(ORGAN_MUSIC_IDENTIFIER, ORGAN_MUSIC_URL, get_list_of_events, get_slice_of_events, "Concerts", "Organ music")
-    add_row_to_event_info(AUTHOR_SONG_IDENTIFIER, AUTHOR_SONG_URL, get_list_of_events, get_slice_of_events, "Concerts", "Author song")
-    
+    add_row_to_event_info(ORGAN_MUSIC_IDENTIFIER, ORGAN_MUSIC_URL, get_list_of_events, get_slice_of_events, "Concerts", "Organ_music")
+    add_row_to_event_info(AUTHOR_SONG_IDENTIFIER, AUTHOR_SONG_URL, get_list_of_events, get_slice_of_events, "Concerts", "Author_song")
+
     # Exhibitions
-    add_row_to_event_info(MODERN_ART_EXHIBIT_IDENTIFIER, MODERN_ART_EXHIBIT_URL, get_list_of_events, get_slice_of_events, "Exhibitions", "Modern art")
+    add_row_to_event_info(MODERN_ART_EXHIBIT_IDENTIFIER, MODERN_ART_EXHIBIT_URL, get_list_of_events, get_slice_of_events, "Exhibitions", "Modern_art")
     add_row_to_event_info(PHOTO_IDENTIFIER, PHOTO_URL, get_list_of_events, get_slice_of_events, "Exhibitions", "Photo")
     add_row_to_event_info(GRAPHIC_IDENTIFIER, GRAPHIC_URL, get_list_of_events, get_slice_of_events, "Exhibitions", "Graphic")
     add_row_to_event_info(PAINTING_IDENTIFIER, PAINTING_URL, get_list_of_events, get_slice_of_events, "Exhibitions", "Painting")
@@ -89,8 +88,11 @@ def start(message):
     stats_user_connected(message.chat.username)
 
 def get_list_of_events(url):
-    resp = urlopen(url).read().decode('utf8')
-    events = json.loads(resp)
+    resp = do_urlopen(url)
+    if not resp:
+        return resp
+
+    events = json.loads(resp.read().decode('utf8'))
 
     events_list = []
     for event in events['events']:
@@ -155,15 +157,18 @@ def do_pagination(c):
     # prepare data for source_identifier
     event_url = get_url_for_identifier(source_identifier)
     events_list = get_getter_for_identifier(source_identifier)(event_url)
-    text = get_slicer_for_identifier(source_identifier)(events_list, offset, offset + PAGE_STEP)
-    # send data to user
-    bot.edit_message_text(
-        chat_id = c.message.chat.id,
-        message_id = c.message.message_id,
-        text = text,
-        parse_mode = 'Markdown',
-        reply_markup = make_inline_buttons(offset, offset + PAGE_STEP, len(events_list), source_identifier))
-
+    if events_list:
+        text = get_slicer_for_identifier(source_identifier)(events_list, offset, offset + PAGE_STEP)
+        # send data to user
+        bot.edit_message_text(
+            chat_id = c.message.chat.id,
+            message_id = c.message.message_id,
+            text = text,
+            parse_mode = 'Markdown',
+            reply_markup = make_inline_buttons(offset, offset + PAGE_STEP, len(events_list), source_identifier))
+    else:
+        text = MIN_CULT_CONNECTION_ERROR
+        bot.send_message(chat_id=c.message.chat.id, text=text)
 
 def process_main_step(message):
     chat_id = message.chat.id
@@ -301,7 +306,7 @@ def process_step_2(message):
     elif message.text==('Фольклор'):
         stats_user_click(username, get_cat1_for_identifier(FOLKLORE_IDENTIFIER), get_cat2_for_identifier(FOLKLORE_IDENTIFIER))
         make_first_answer(FOLKLORE_IDENTIFIER, chat_id, process_step_2)
-        
+
     # this is concert
     elif message.text==('Опера'):
         stats_user_click(username, get_cat1_for_identifier(OPERA_IDENTIFIER), get_cat2_for_identifier(OPERA_IDENTIFIER))
@@ -321,7 +326,7 @@ def process_step_2(message):
     elif message.text==('Авторская песня'):
         stats_user_click(username, get_cat1_for_identifier(AUTHOR_SONG_IDENTIFIER), get_cat2_for_identifier(AUTHOR_SONG_IDENTIFIER))
         make_first_answer(AUTHOR_SONG_IDENTIFIER, chat_id, process_step_2)
-        
+
     # this is exhibition
     elif message.text==('Современное Искусство'):
         stats_user_click(username, get_cat1_for_identifier(MODERN_ART_EXHIBIT_IDENTIFIER), get_cat2_for_identifier(MODERN_ART_EXHIBIT_IDENTIFIER))
@@ -347,22 +352,22 @@ def process_step_2(message):
         print("Unknown command")
 
 
-#username = str(message.chat.username)
-#data = {'cat1': resp_cat1, 'cat2': resp_cat2, "username": username}
-#url_cat2 = urllib.request.urlopen("http://admin.theartr.ru/stat_backend/click?cat1=" + resp_cat1 + '&cat2=' + resp_cat2 + '&username=' + username)
-
 # use that function to make first message
 # after that will used @callback_query_handler
 def make_first_answer(source_identifier, chat_id, handler):
-    # TODO: check MinCult connection
     print('received source_identifier {}'.format(source_identifier))
     # prepare data for source_identifier
     event_url = get_url_for_identifier(source_identifier)
     events_list = get_getter_for_identifier(source_identifier)(event_url)
-    text = get_slicer_for_identifier(source_identifier)(events_list, 0, PAGE_STEP)
-    # send data to user
-    next_step = bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown',
-            reply_markup=make_inline_buttons(0, PAGE_STEP, len(events_list), source_identifier))
+    if events_list:
+        text = get_slicer_for_identifier(source_identifier)(events_list, 0, PAGE_STEP)
+        # send data to user
+        next_step = bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown',
+                reply_markup=make_inline_buttons(0, PAGE_STEP, len(events_list), source_identifier))
+    else:
+        text = MIN_CULT_CONNECTION_ERROR
+        next_step = bot.send_message(chat_id=chat_id, text=text)
+
     bot.register_next_step_handler(next_step, handler)
 
 

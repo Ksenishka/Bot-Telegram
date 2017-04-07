@@ -4,6 +4,8 @@ PAGE_STEP = 3
 
 STATS_URL = "http://admin.theartr.ru/stat_backend/"
 
+MIN_CULT_CONNECTION_ERROR = "Не удалось соединиться с сервером МинКульт"
+
 FILMS_IDENTIFIER = 1
 FILMS_URL = "https://all.culture.ru/api/2.2/events?status=accepted&start=1488821641399&locales=2579&tags=164"
 
