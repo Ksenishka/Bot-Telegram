@@ -175,8 +175,8 @@ def process_main_step(message):
     username = message.chat.username
 
     if message.text=='Спектакли \U0001F3AD':
-        stats_user_click(username, "Performances")
         print('Performances')
+        stats_user_click(username, "Performances")
 
         markup = types.ReplyKeyboardMarkup()
         item1 = types.KeyboardButton('Современное искусство')
@@ -218,7 +218,6 @@ def process_main_step(message):
         make_first_answer(LECTURES_IDENTIFIER, chat_id, process_main_step)
 
     elif message.text=='Концерты \U0001F3BC':
-        #url_cat2 = urllib.request.urlopen('http://admin.theartr.ru/stat_backend/click?cat1=Concerts&username=' + message.chat.username)
         print('Concerts')
         stats_user_click(username, "Concerts")
 
@@ -245,8 +244,8 @@ def process_main_step(message):
         bot.register_next_step_handler(next_step, process_step_2)
 
     elif message.text=='Выставки \U0001F3A8':
-        #url_cat2 = urllib.request.urlopen('http://admin.theartr.ru/stat_backend/click?cat1=Exhibitions&username=' + message.chat.username)
         print('Exhibitions')
+        stats_user_click(username, "Exhibitions")
 
         markup = types.ReplyKeyboardMarkup()
         item1 = types.KeyboardButton("Современное Искусство")
