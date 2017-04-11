@@ -160,12 +160,15 @@ def do_pagination(c):
     if events_list:
         text = get_slicer_for_identifier(source_identifier)(events_list, offset, offset + PAGE_STEP)
         # send data to user
-        bot.edit_message_text(
-            chat_id = c.message.chat.id,
-            message_id = c.message.message_id,
-            text = text,
-            parse_mode = 'Markdown',
-            reply_markup = make_inline_buttons(offset, offset + PAGE_STEP, len(events_list), source_identifier))
+        try:
+            bot.edit_message_text(
+                chat_id = c.message.chat.id,
+                message_id = c.message.message_id,
+                text = text,
+                parse_mode = 'Markdown',
+                reply_markup = make_inline_buttons(offset, offset + PAGE_STEP, len(events_list), source_identifier))
+        except:
+            print('edit_message() failed')
     else:
         text = MIN_CULT_CONNECTION_ERROR
         bot.send_message(chat_id=c.message.chat.id, text=text)
