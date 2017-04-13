@@ -87,6 +87,12 @@ def start(message):
     bot.register_next_step_handler(next_step, process_main_step)
     stats_user_connected(message.chat.username)
 
+def check_none(input):
+    if input != None:
+        return input
+    else:
+        return ''    
+    
 def get_list_of_events(url):
     resp = do_urlopen(url)
     if not resp:
@@ -98,10 +104,11 @@ def get_list_of_events(url):
     for event in events['events']:
         # NOTE: we use only first place for 'place' and 'address', maybe it's wrong
         # The same case for 'url'
-        events_list.append({'name': event['name'], 'place': event['places'][0],
-            'address': event['places'][0]['address'], 'price': event['price'],
-            'shortDescription': event['shortDescription'], 'ext_info': event['externalInfo'][0]})
-
+        events_list.append({'name': check_none(event['name']), 'place': check_none(event['places'][0]), 
+                            'address': check_none(event['places'][0]['address']), 
+                            'shortDescription': check_none(event['shortDescription']), 
+                            'ext_info': check_none(event['externalInfo'][0])})
+        
     return events_list
 
 
