@@ -81,6 +81,7 @@ def start(message):
             'Концерты \U0001F3BC',
             'Кинопоказ \U0001F4FA',
             'Лекции \U0001F4DA')
+    update_sent_msg()
     next_step = bot.send_message(message.chat.id,
             'Выберете интересующее вас направление.',
             reply_markup=markup)
@@ -91,8 +92,8 @@ def check_none(input):
     if input != None:
         return input
     else:
-        return ''    
-    
+        return ''
+
 def get_list_of_events(url):
     resp = do_urlopen(url)
     if not resp:
@@ -108,7 +109,7 @@ def get_list_of_events(url):
                             'address': check_none(event['places'][0]['address']), 
                             'shortDescription': check_none(event['shortDescription']), 
                             'ext_info': check_none(event['externalInfo'][0])})
-        
+
     return events_list
 
 
@@ -168,6 +169,7 @@ def do_pagination(c):
         text = get_slicer_for_identifier(source_identifier)(events_list, offset, offset + PAGE_STEP)
         # send data to user
         try:
+            update_sent_msg()
             bot.edit_message_text(
                 chat_id = c.message.chat.id,
                 message_id = c.message.message_id,
@@ -178,6 +180,7 @@ def do_pagination(c):
             print('edit_message() failed')
     else:
         text = MIN_CULT_CONNECTION_ERROR
+        update_sent_msg()
         bot.send_message(chat_id=c.message.chat.id, text=text)
 
 def process_main_step(message):
@@ -213,6 +216,7 @@ def process_main_step(message):
         markup.row(item10)
         markup.row(item)
 
+        update_sent_msg()
         next_step = bot.send_message(message.chat.id,
                 'Какое направление предпочитаете? \nДля полного списка прокрутите вниз!', reply_markup=markup)
         bot.register_next_step_handler(next_step, process_step_2)
@@ -248,6 +252,7 @@ def process_main_step(message):
         markup.row(item6)
         markup.row(item)
 
+        update_sent_msg()
         next_step = bot.send_message(message.chat.id,
                 'Какое направление предпочитаете? \nДля полного списка прокрутите вниз!',
                 reply_markup=markup)
@@ -274,6 +279,7 @@ def process_main_step(message):
         markup.row(item6)
         markup.row(item)
 
+        update_sent_msg()
         next_step = bot.send_message(message.chat.id,
                 'Какое направление предпочитаете? \n Для полного списка прокрутите вниз!',
                 reply_markup=markup)
@@ -371,10 +377,12 @@ def make_first_answer(source_identifier, chat_id, handler):
     if events_list:
         text = get_slicer_for_identifier(source_identifier)(events_list, 0, PAGE_STEP)
         # send data to user
+        update_sent_msg()
         next_step = bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown',
                 reply_markup=make_inline_buttons(0, PAGE_STEP, len(events_list), source_identifier))
     else:
         text = MIN_CULT_CONNECTION_ERROR
+        update_sent_msg()
         next_step = bot.send_message(chat_id=chat_id, text=text)
 
     bot.register_next_step_handler(next_step, handler)

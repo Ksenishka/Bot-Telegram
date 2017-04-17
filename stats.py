@@ -18,3 +18,9 @@ def do_urlopen(url):
     except:
         print("urlopen() for url={} failed".format(url))
         return None
+
+sent_msg = 0
+def update_sent_msg():
+    global sent_msg
+    sent_msg += 1
+    print('sent_msg={}'.format(sent_msg))
