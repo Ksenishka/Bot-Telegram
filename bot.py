@@ -22,12 +22,6 @@ bot = telebot.TeleBot(BOT_TOKEN)
 # - category 1 (required)
 # - category 2 (optional)
 events_info = {}
-msg_to_tg = 0
-def update_metric():
-    global msg_to_tg
-    msg_to_tg += 1
-    print('Sent message count = {}'.format(msg_to_tg))
-
 
 def add_row_to_event_info(identifier, url, getter, slicer, cat1, cat2=None):
     events_info[identifier] = [url, getter, slicer, cat1, cat2]
@@ -79,32 +73,26 @@ def initialize():
     add_row_to_event_info(DESIGN_IDENTIFIER, DESIGN_URL, get_list_of_events, get_slice_of_events, "Exhibitions", "Design")
     add_row_to_event_info(SCULPTURE_IDENTIFIER, SCULPTURE_URL, get_list_of_events, get_slice_of_events, "Exhibitions", "Sculpture")
 
-
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.ReplyKeyboardMarkup(one_time_keyboard=True)
-    update_metric()
     markup.add('Выставки \U0001F3A8',
             'Спектакли \U0001F3AD',
             'Концерты \U0001F3BC',
             'Кинопоказ \U0001F4FA',
             'Лекции \U0001F4DA')
-    update_metric()
     next_step = bot.send_message(message.chat.id,
             'Выберете интересующее вас направление.',
             reply_markup=markup)
-    update_metric()
     bot.register_next_step_handler(next_step, process_main_step)
-    update_metric()
     stats_user_connected(message.chat.username)
-    update_metric()
 
 def check_none(input):
     if input != None:
         return input
     else:
-        return ''
-
+        return ''    
+    
 def get_list_of_events(url):
     resp = do_urlopen(url)
     if not resp:
@@ -113,12 +101,14 @@ def get_list_of_events(url):
     events = json.loads(resp.read().decode('utf8'))
 
     events_list = []
-
     for event in events['events']:
+        # NOTE: we use only first place for 'place' and 'address', maybe it's wrong
+        # The same case for 'url'
         events_list.append({'name': check_none(event['name']), 'place': check_none(event['places'][0]), 
-        'address': check_none(event['places'][0]['address']), 'shortDescription': check_none(event['shortDescription']), 
-        'ext_info': check_none(event['externalInfo'][0])})
-
+                            'address': check_none(event['places'][0]['address']), 
+                            'shortDescription': check_none(event['shortDescription']), 
+                            'ext_info': check_none(event['externalInfo'][0])})
+        
     return events_list
 
 
@@ -144,19 +134,15 @@ def get_slice_of_events(events_list, start, stop):
 
 def make_inline_buttons(start, stop, source_len, source_identifier):
     keyboard = types.InlineKeyboardMarkup()
-    update_metric()
 
     btns = []
     if start > 0:
         btns.append(types.InlineKeyboardButton(
             text='\U00002B05', callback_data='{}_{}'.format(source_identifier, start - PAGE_STEP)))
-        update_metric()
     if stop < source_len:
         btns.append(types.InlineKeyboardButton(
             text='\U000027A1', callback_data='{}_{}'.format(source_identifier, stop)))
-        update_metric()
     keyboard.add(*btns)
-    update_metric()
 
     return keyboard
 
@@ -188,27 +174,21 @@ def do_pagination(c):
                 text = text,
                 parse_mode = 'Markdown',
                 reply_markup = make_inline_buttons(offset, offset + PAGE_STEP, len(events_list), source_identifier))
-            update_metric()
         except:
             print('edit_message() failed')
     else:
         text = MIN_CULT_CONNECTION_ERROR
         bot.send_message(chat_id=c.message.chat.id, text=text)
-        update_metric()
 
 def process_main_step(message):
     chat_id = message.chat.id
-    update_metric()
     username = message.chat.username
-    update_metric()
 
     if message.text=='Спектакли \U0001F3AD':
         print('Performances')
-        update_metric()
         stats_user_click(username, "Performances")
 
         markup = types.ReplyKeyboardMarkup()
-        update_metric()
         item1 = types.KeyboardButton('Современное искусство')
         item2= types.KeyboardButton("Классическое искусство")
         item3 = types.KeyboardButton("Трагикомедия")
@@ -235,30 +215,23 @@ def process_main_step(message):
 
         next_step = bot.send_message(message.chat.id,
                 'Какое направление предпочитаете? \nДля полного списка прокрутите вниз!', reply_markup=markup)
-        update_metric()
-
         bot.register_next_step_handler(next_step, process_step_2)
-        update_metric()
 
     elif message.text==('Кинопоказ \U0001F4FA'):
-        update_metric()
         print('Film screening')
         stats_user_click(username, get_cat1_for_identifier(FILMS_IDENTIFIER))
         make_first_answer(FILMS_IDENTIFIER, chat_id, process_main_step)
 
     elif message.text==('Лекции \U0001F4DA'):
-        update_metric()
         print('Lectures')
         stats_user_click(username, get_cat1_for_identifier(LECTURES_IDENTIFIER))
         make_first_answer(LECTURES_IDENTIFIER, chat_id, process_main_step)
 
     elif message.text=='Концерты \U0001F3BC':
-        update_metric()
         print('Concerts')
         stats_user_click(username, "Concerts")
 
         markup = types.ReplyKeyboardMarkup()
-        update_metric()
         item1 = types.KeyboardButton("Опера")
         item2 = types.KeyboardButton("Классическая музыка")
         item3 = types.KeyboardButton("Фольклорная музыка")
@@ -278,17 +251,13 @@ def process_main_step(message):
         next_step = bot.send_message(message.chat.id,
                 'Какое направление предпочитаете? \nДля полного списка прокрутите вниз!',
                 reply_markup=markup)
-        update_metric()
         bot.register_next_step_handler(next_step, process_step_2)
-        update_metric()
 
     elif message.text=='Выставки \U0001F3A8':
         print('Exhibitions')
-        update_metric()
         stats_user_click(username, "Exhibitions")
 
         markup = types.ReplyKeyboardMarkup()
-        update_metric()
         item1 = types.KeyboardButton("Современное Искусство")
         item2 = types.KeyboardButton("Фотография")
         item3 = types.KeyboardButton("Графика")
@@ -308,112 +277,85 @@ def process_main_step(message):
         next_step = bot.send_message(message.chat.id,
                 'Какое направление предпочитаете? \n Для полного списка прокрутите вниз!',
                 reply_markup=markup)
-        update_metric()
         bot.register_next_step_handler(next_step, process_step_2)
-        update_metric()
 
 
 def process_step_2(message):
     chat_id = message.chat.id
-    update_metric()
     username = message.chat.username
-    update_metric()
 
     # this is performance
     if message.text==("Трагикомедия"):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(TRAGICOMEDY_IDENTIFIER), get_cat2_for_identifier(TRAGICOMEDY_IDENTIFIER))
         make_first_answer(TRAGICOMEDY_IDENTIFIER, chat_id, process_step_2)
     elif message.text==("Современное искусство"):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(MODERN_ART_IDENTIFIER), get_cat2_for_identifier(MODERN_ART_IDENTIFIER))
         make_first_answer(MODERN_ART_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Классическое искусство'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(CLASSIC_ART_IDENTIFIER), get_cat2_for_identifier(CLASSIC_ART_IDENTIFIER))
         make_first_answer(CLASSIC_ART_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Драма'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(DRAMA_IDENTIFIER), get_cat2_for_identifier(DRAMA_IDENTIFIER))
         make_first_answer(DRAMA_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Комедия'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(COMEDY_IDENTIFIER), get_cat2_for_identifier(COMEDY_IDENTIFIER))
         make_first_answer(COMEDY_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Балет'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(BALLET_IDENTIFIER), get_cat2_for_identifier(BALLET_IDENTIFIER))
         make_first_answer(BALLET_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Моноспектакль'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(MONOSPECT_IDENTIFIER), get_cat2_for_identifier(MONOSPECT_IDENTIFIER))
         make_first_answer(MONOSPECT_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Эксперементальный театр'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(EXP_THEATRE_IDENTIFIER), get_cat2_for_identifier(EXP_THEATRE_IDENTIFIER))
         make_first_answer(EXP_THEATRE_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Кукольный спектакль'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(PUPPET_SHOW_IDENTIFIER), get_cat2_for_identifier(PUPPET_SHOW_IDENTIFIER))
         make_first_answer(PUPPET_SHOW_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Фольклор'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(FOLKLORE_IDENTIFIER), get_cat2_for_identifier(FOLKLORE_IDENTIFIER))
         make_first_answer(FOLKLORE_IDENTIFIER, chat_id, process_step_2)
 
     # this is concert
     elif message.text==('Опера'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(OPERA_IDENTIFIER), get_cat2_for_identifier(OPERA_IDENTIFIER))
         make_first_answer(OPERA_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Классическая музыка'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(CLASSIC_MUSIC_IDENTIFIER), get_cat2_for_identifier(CLASSIC_MUSIC_IDENTIFIER))
         make_first_answer(CLASSIC_MUSIC_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Фольклорная музыка'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(FOLKLORE_MUSIC_IDENTIFIER), get_cat2_for_identifier(FOLKLORE_MUSIC_IDENTIFIER))
         make_first_answer(FOLKLORE_MUSIC_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Джаз'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(JAZZ_IDENTIFIER), get_cat2_for_identifier(JAZZ_IDENTIFIER))
         make_first_answer(JAZZ_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Органная музыка'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(ORGAN_MUSIC_IDENTIFIER), get_cat2_for_identifier(ORGAN_MUSIC_IDENTIFIER))
         make_first_answer(ORGAN_MUSIC_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Авторская песня'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(AUTHOR_SONG_IDENTIFIER), get_cat2_for_identifier(AUTHOR_SONG_IDENTIFIER))
         make_first_answer(AUTHOR_SONG_IDENTIFIER, chat_id, process_step_2)
 
     # this is exhibition
     elif message.text==('Современное Искусство'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(MODERN_ART_EXHIBIT_IDENTIFIER), get_cat2_for_identifier(MODERN_ART_EXHIBIT_IDENTIFIER))
         make_first_answer(MODERN_ART_EXHIBIT_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Фотография'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(PHOTO_IDENTIFIER), get_cat2_for_identifier(PHOTO_IDENTIFIER))
         make_first_answer(PHOTO_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Графика'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(GRAPHIC_IDENTIFIER), get_cat2_for_identifier(GRAPHIC_IDENTIFIER))
         make_first_answer(GRAPHIC_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Живопись'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(PAINTING_IDENTIFIER), get_cat2_for_identifier(PAINTING_IDENTIFIER))
         make_first_answer(PAINTING_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Дизайн'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(DESIGN_IDENTIFIER), get_cat2_for_identifier(DESIGN_IDENTIFIER))
         make_first_answer(DESIGN_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Скульптура'):
-        update_metric()
         stats_user_click(username, get_cat1_for_identifier(SCULPTURE_IDENTIFIER), get_cat2_for_identifier(SCULPTURE_IDENTIFIER))
         make_first_answer(SCULPTURE_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Главное меню'):
-        update_metric()
         start(message)
     else:
         print("Unknown command")
@@ -431,15 +373,11 @@ def make_first_answer(source_identifier, chat_id, handler):
         # send data to user
         next_step = bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown',
                 reply_markup=make_inline_buttons(0, PAGE_STEP, len(events_list), source_identifier))
-        update_metric()
     else:
         text = MIN_CULT_CONNECTION_ERROR
         next_step = bot.send_message(chat_id=chat_id, text=text)
-        update_metric()
 
     bot.register_next_step_handler(next_step, handler)
-    update_metric()
-
 
 
 if __name__ == "__main__":
