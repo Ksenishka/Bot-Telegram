@@ -11,9 +11,13 @@ from urllib.request import urlopen
 
 from defines import *
 from stats import *
+from rate_limiter import RateLimiter
 
 
 bot = telebot.TeleBot(BOT_TOKEN)
+
+rate_limiter = RateLimiter
+
 # this dictionary has key=source_identifier and value=list where
 # list contains 5 elements:
 # - source_url
@@ -22,9 +26,7 @@ bot = telebot.TeleBot(BOT_TOKEN)
 # - category 1 (required)
 # - category 2 (optional)
 events_info = {}
-        
-    
-    
+
 def add_row_to_event_info(identifier, url, getter, slicer, cat1, cat2=None):
     events_info[identifier] = [url, getter, slicer, cat1, cat2]
 
