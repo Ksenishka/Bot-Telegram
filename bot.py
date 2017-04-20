@@ -23,6 +23,29 @@ bot = telebot.TeleBot(BOT_TOKEN)
 # - category 2 (optional)
 events_info = {}
 
+rate = 1.0; // unit: messages
+per  = 1.0; // unit: seconds
+allowance = rate; // unit: messages
+last_check = now(); // floating-point, e.g. usec accuracy. Unit: seconds
+
+def discard_message():
+    
+    
+def rate_limiting():
+    current = now() 
+    time_passed = current - last_check
+    last_check = current
+    allowance += time_passed * (rate / per)
+    if (allowance > rate):
+        allowance = rate
+    if (allowance < 1.0):
+        discard_message()
+    else:
+        make_first_answer()
+        allowance -= 1.0
+        
+    
+    
 def add_row_to_event_info(identifier, url, getter, slicer, cat1, cat2=None):
     events_info[identifier] = [url, getter, slicer, cat1, cat2]
 
@@ -293,7 +316,8 @@ def process_step_2(message):
     # this is performance
     if message.text==("Трагикомедия"):
         stats_user_click(username, get_cat1_for_identifier(TRAGICOMEDY_IDENTIFIER), get_cat2_for_identifier(TRAGICOMEDY_IDENTIFIER))
-        make_first_answer(TRAGICOMEDY_IDENTIFIER, chat_id, process_step_2)
+        rate_limiting()
+        #make_first_answer(TRAGICOMEDY_IDENTIFIER, chat_id, process_step_2)
     elif message.text==("Современное искусство"):
         stats_user_click(username, get_cat1_for_identifier(MODERN_ART_IDENTIFIER), get_cat2_for_identifier(MODERN_ART_IDENTIFIER))
         make_first_answer(MODERN_ART_IDENTIFIER, chat_id, process_step_2)
