@@ -24,3 +24,9 @@ def update_sent_msg():
     global sent_msg
     sent_msg += 1
     print('sent_msg={}'.format(sent_msg))
+
+drop_msg = 0
+def update_drop_msg():
+    global drop_msg
+    drop_msg += 1
+    print('drop_msg={}'.format(drop_msg))

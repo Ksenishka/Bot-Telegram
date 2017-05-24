@@ -16,7 +16,15 @@ from rate_limiter import RateLimiter
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
-rate_limiter = RateLimiter
+rate_limiter = RateLimiter()
+
+class FakeChat:
+    def __init__(self, chat_id):
+        self.id = chat_id
+
+class FakeMessage:
+    def __init__(self, chat_id):
+        self.chat = FakeChat(chat_id)
 
 # this dictionary has key=source_identifier and value=list where
 # list contains 5 elements:
@@ -85,10 +93,16 @@ def start(message):
             'Концерты \U0001F3BC',
             'Кинопоказ \U0001F4FA',
             'Лекции \U0001F4DA')
+
+    if not rate_limiter.can_send_to(message.chat.id):
+        update_drop_msg()
+        return
+
     update_sent_msg()
     next_step = bot.send_message(message.chat.id,
             'Выберете интересующее вас направление.',
             reply_markup=markup)
+    rate_limiter.send_to(message.chat.id)
     bot.register_next_step_handler(next_step, process_main_step)
     stats_user_connected(message.chat.username)
 
@@ -220,9 +234,16 @@ def process_main_step(message):
         markup.row(item10)
         markup.row(item)
 
+        if not rate_limiter.can_send_to(message.chat.id):
+            update_drop_msg()
+            fake_step = FakeMessage(message.chat.id)
+            bot.register_next_step_handler(fake_step, process_main_step)
+            return
+
         update_sent_msg()
         next_step = bot.send_message(message.chat.id,
                 'Какое направление предпочитаете? \nДля полного списка прокрутите вниз!', reply_markup=markup)
+        rate_limiter.send_to(message.chat.id)
         bot.register_next_step_handler(next_step, process_step_2)
 
     elif message.text==('Кинопоказ \U0001F4FA'):
@@ -256,10 +277,17 @@ def process_main_step(message):
         markup.row(item6)
         markup.row(item)
 
+        if not rate_limiter.can_send_to(message.chat.id):
+            update_drop_msg()
+            fake_step = FakeMessage(message.chat.id)
+            bot.register_next_step_handler(fake_step, process_main_step)
+            return
+
         update_sent_msg()
         next_step = bot.send_message(message.chat.id,
                 'Какое направление предпочитаете? \nДля полного списка прокрутите вниз!',
                 reply_markup=markup)
+        rate_limiter.send_to(message.chat.id)
         bot.register_next_step_handler(next_step, process_step_2)
 
     elif message.text=='Выставки \U0001F3A8':
@@ -283,10 +311,17 @@ def process_main_step(message):
         markup.row(item6)
         markup.row(item)
 
+        if not rate_limiter.can_send_to(message.chat.id):
+            update_drop_msg()
+            fake_step = FakeMessage(message.chat.id)
+            bot.register_next_step_handler(fake_step, process_main_step)
+            return
+
         update_sent_msg()
         next_step = bot.send_message(message.chat.id,
                 'Какое направление предпочитаете? \n Для полного списка прокрутите вниз!',
                 reply_markup=markup)
+        rate_limiter.send_to(message.chat.id)
         bot.register_next_step_handler(next_step, process_step_2)
 
 
@@ -375,6 +410,14 @@ def process_step_2(message):
 # after that will used @callback_query_handler
 def make_first_answer(source_identifier, chat_id, handler):
     print('received source_identifier {}'.format(source_identifier))
+
+    # check limitations
+    if not rate_limiter.can_send_to(chat_id):
+        update_drop_msg()
+        fake_step = FakeMessage(chat_id)
+        bot.register_next_step_handler(fake_step, handler)
+        return
+
     # prepare data for source_identifier
     event_url = get_url_for_identifier(source_identifier)
     events_list = get_getter_for_identifier(source_identifier)(event_url)
@@ -389,6 +432,7 @@ def make_first_answer(source_identifier, chat_id, handler):
         update_sent_msg()
         next_step = bot.send_message(chat_id=chat_id, text=text)
 
+    rate_limiter.send_to(chat_id)
     bot.register_next_step_handler(next_step, handler)
 
 
