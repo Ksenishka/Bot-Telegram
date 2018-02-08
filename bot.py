@@ -106,11 +106,16 @@ def start(message):
     bot.register_next_step_handler(next_step, process_main_step)
     stats_user_connected(message.chat.username)
 
-def check_none(input):
-    if input != None:
-        return input
-    else:
-        return ''
+def check_none(input, key, index=-1, subkey=""):
+    if key in input:
+        if index == -1:
+            return input[key]
+        if len(input) > index:
+            if subkey == "":
+                return input[key][index]
+            return input[key][index][subkey]
+
+    return ''
 
 def get_list_of_events(url):
     resp = do_urlopen(url)
@@ -123,10 +128,10 @@ def get_list_of_events(url):
     for event in events['events']:
         # NOTE: we use only first place for 'place' and 'address', maybe it's wrong
         # The same case for 'url'
-        events_list.append({'name': check_none(event['name']), 'place': check_none(event['places'][0]), 
-                            'address': check_none(event['places'][0]['address']), 
-                            'shortDescription': check_none(event['shortDescription']), 
-                            'ext_info': check_none(event['externalInfo'][0])})
+        events_list.append({'name': check_none(event, 'name'), 'place': check_none(event, 'places', 0),
+                            'address': check_none(event, 'places', 0, 'address'),
+                            'shortDescription': check_none(event, 'shortDescription'),
+                            'ext_info': check_none(event, 'externalInfo', 0)})
 
     return events_list
 
@@ -145,7 +150,7 @@ def get_slice_of_events(events_list, start, stop):
         short_desc = 'Краткое описание: ' + event['shortDescription'] + '\n\n'
         show_url = ''
         if('url' in event['ext_info']):
-            show_url = 'Подробнее: ' + event['ext_info']['url'] + '\n\n'
+            show_url = 'Подробнее: [' + event['ext_info']['url'] + ']\n\n'
         result += name + place + address + short_desc + show_url + '\n\n'
 
     return result
