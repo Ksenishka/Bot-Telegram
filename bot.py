@@ -14,7 +14,7 @@ from stats import *
 from rate_limiter import RateLimiter
 
 
-bot = telebot.TeleBot(BOT_TOKEN)
+bot = telebot.TeleBot(token=BOT_TOKEN, threaded=False)
 
 rate_limiter = RateLimiter()
 
@@ -25,6 +25,8 @@ class FakeChat:
 class FakeMessage:
     def __init__(self, chat_id):
         self.chat = FakeChat(chat_id)
+
+db_manager = SimpleDbManager(DB_NAME)
 
 # this dictionary has key=source_identifier and value=list where
 # list contains 5 elements:
@@ -104,7 +106,6 @@ def start(message):
             reply_markup=markup)
     rate_limiter.send_to(message.chat.id)
     bot.register_next_step_handler(next_step, process_main_step)
-    stats_user_connected(message.chat.username)
 
 def check_none(input, key, index=-1, subkey=""):
     if key in input:
@@ -116,6 +117,14 @@ def check_none(input, key, index=-1, subkey=""):
             return input[key][index][subkey]
 
     return ''
+
+def do_urlopen(url):
+    try:
+        resp = urlopen(url)
+        return resp
+    except:
+        print("urlopen() for url={} failed".format(url))
+        return None
 
 def get_list_of_events(url):
     resp = do_urlopen(url)
@@ -212,7 +221,7 @@ def process_main_step(message):
 
     if message.text=='Спектакли \U0001F3AD':
         print('Performances')
-        stats_user_click(username, "Performances")
+        db_manager.add_record(username, "Performances")
 
         markup = types.ReplyKeyboardMarkup()
         item1 = types.KeyboardButton('Современное искусство')
@@ -253,17 +262,17 @@ def process_main_step(message):
 
     elif message.text==('Кинопоказ \U0001F4FA'):
         print('Film screening')
-        stats_user_click(username, get_cat1_for_identifier(FILMS_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(FILMS_IDENTIFIER))
         make_first_answer(FILMS_IDENTIFIER, chat_id, process_main_step)
 
     elif message.text==('Лекции \U0001F4DA'):
         print('Lectures')
-        stats_user_click(username, get_cat1_for_identifier(LECTURES_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(LECTURES_IDENTIFIER))
         make_first_answer(LECTURES_IDENTIFIER, chat_id, process_main_step)
 
     elif message.text=='Концерты \U0001F3BC':
         print('Concerts')
-        stats_user_click(username, "Concerts")
+        db_manager.add_record(username, "Concerts")
 
         markup = types.ReplyKeyboardMarkup()
         item1 = types.KeyboardButton("Опера")
@@ -297,7 +306,7 @@ def process_main_step(message):
 
     elif message.text=='Выставки \U0001F3A8':
         print('Exhibitions')
-        stats_user_click(username, "Exhibitions")
+        db_manager.add_record(username, "Exhibitions")
 
         markup = types.ReplyKeyboardMarkup()
         item1 = types.KeyboardButton("Современное Искусство")
@@ -336,74 +345,74 @@ def process_step_2(message):
 
     # this is performance
     if message.text==("Трагикомедия"):
-        stats_user_click(username, get_cat1_for_identifier(TRAGICOMEDY_IDENTIFIER), get_cat2_for_identifier(TRAGICOMEDY_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(TRAGICOMEDY_IDENTIFIER), get_cat2_for_identifier(TRAGICOMEDY_IDENTIFIER))
         make_first_answer(TRAGICOMEDY_IDENTIFIER, chat_id, process_step_2)
     elif message.text==("Современное искусство"):
-        stats_user_click(username, get_cat1_for_identifier(MODERN_ART_IDENTIFIER), get_cat2_for_identifier(MODERN_ART_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(MODERN_ART_IDENTIFIER), get_cat2_for_identifier(MODERN_ART_IDENTIFIER))
         make_first_answer(MODERN_ART_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Классическое искусство'):
-        stats_user_click(username, get_cat1_for_identifier(CLASSIC_ART_IDENTIFIER), get_cat2_for_identifier(CLASSIC_ART_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(CLASSIC_ART_IDENTIFIER), get_cat2_for_identifier(CLASSIC_ART_IDENTIFIER))
         make_first_answer(CLASSIC_ART_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Драма'):
-        stats_user_click(username, get_cat1_for_identifier(DRAMA_IDENTIFIER), get_cat2_for_identifier(DRAMA_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(DRAMA_IDENTIFIER), get_cat2_for_identifier(DRAMA_IDENTIFIER))
         make_first_answer(DRAMA_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Комедия'):
-        stats_user_click(username, get_cat1_for_identifier(COMEDY_IDENTIFIER), get_cat2_for_identifier(COMEDY_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(COMEDY_IDENTIFIER), get_cat2_for_identifier(COMEDY_IDENTIFIER))
         make_first_answer(COMEDY_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Балет'):
-        stats_user_click(username, get_cat1_for_identifier(BALLET_IDENTIFIER), get_cat2_for_identifier(BALLET_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(BALLET_IDENTIFIER), get_cat2_for_identifier(BALLET_IDENTIFIER))
         make_first_answer(BALLET_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Моноспектакль'):
-        stats_user_click(username, get_cat1_for_identifier(MONOSPECT_IDENTIFIER), get_cat2_for_identifier(MONOSPECT_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(MONOSPECT_IDENTIFIER), get_cat2_for_identifier(MONOSPECT_IDENTIFIER))
         make_first_answer(MONOSPECT_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Эксперементальный театр'):
-        stats_user_click(username, get_cat1_for_identifier(EXP_THEATRE_IDENTIFIER), get_cat2_for_identifier(EXP_THEATRE_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(EXP_THEATRE_IDENTIFIER), get_cat2_for_identifier(EXP_THEATRE_IDENTIFIER))
         make_first_answer(EXP_THEATRE_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Кукольный спектакль'):
-        stats_user_click(username, get_cat1_for_identifier(PUPPET_SHOW_IDENTIFIER), get_cat2_for_identifier(PUPPET_SHOW_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(PUPPET_SHOW_IDENTIFIER), get_cat2_for_identifier(PUPPET_SHOW_IDENTIFIER))
         make_first_answer(PUPPET_SHOW_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Фольклор'):
-        stats_user_click(username, get_cat1_for_identifier(FOLKLORE_IDENTIFIER), get_cat2_for_identifier(FOLKLORE_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(FOLKLORE_IDENTIFIER), get_cat2_for_identifier(FOLKLORE_IDENTIFIER))
         make_first_answer(FOLKLORE_IDENTIFIER, chat_id, process_step_2)
 
     # this is concert
     elif message.text==('Опера'):
-        stats_user_click(username, get_cat1_for_identifier(OPERA_IDENTIFIER), get_cat2_for_identifier(OPERA_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(OPERA_IDENTIFIER), get_cat2_for_identifier(OPERA_IDENTIFIER))
         make_first_answer(OPERA_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Классическая музыка'):
-        stats_user_click(username, get_cat1_for_identifier(CLASSIC_MUSIC_IDENTIFIER), get_cat2_for_identifier(CLASSIC_MUSIC_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(CLASSIC_MUSIC_IDENTIFIER), get_cat2_for_identifier(CLASSIC_MUSIC_IDENTIFIER))
         make_first_answer(CLASSIC_MUSIC_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Фольклорная музыка'):
-        stats_user_click(username, get_cat1_for_identifier(FOLKLORE_MUSIC_IDENTIFIER), get_cat2_for_identifier(FOLKLORE_MUSIC_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(FOLKLORE_MUSIC_IDENTIFIER), get_cat2_for_identifier(FOLKLORE_MUSIC_IDENTIFIER))
         make_first_answer(FOLKLORE_MUSIC_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Джаз'):
-        stats_user_click(username, get_cat1_for_identifier(JAZZ_IDENTIFIER), get_cat2_for_identifier(JAZZ_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(JAZZ_IDENTIFIER), get_cat2_for_identifier(JAZZ_IDENTIFIER))
         make_first_answer(JAZZ_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Органная музыка'):
-        stats_user_click(username, get_cat1_for_identifier(ORGAN_MUSIC_IDENTIFIER), get_cat2_for_identifier(ORGAN_MUSIC_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(ORGAN_MUSIC_IDENTIFIER), get_cat2_for_identifier(ORGAN_MUSIC_IDENTIFIER))
         make_first_answer(ORGAN_MUSIC_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Авторская песня'):
-        stats_user_click(username, get_cat1_for_identifier(AUTHOR_SONG_IDENTIFIER), get_cat2_for_identifier(AUTHOR_SONG_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(AUTHOR_SONG_IDENTIFIER), get_cat2_for_identifier(AUTHOR_SONG_IDENTIFIER))
         make_first_answer(AUTHOR_SONG_IDENTIFIER, chat_id, process_step_2)
 
     # this is exhibition
     elif message.text==('Современное Искусство'):
-        stats_user_click(username, get_cat1_for_identifier(MODERN_ART_EXHIBIT_IDENTIFIER), get_cat2_for_identifier(MODERN_ART_EXHIBIT_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(MODERN_ART_EXHIBIT_IDENTIFIER), get_cat2_for_identifier(MODERN_ART_EXHIBIT_IDENTIFIER))
         make_first_answer(MODERN_ART_EXHIBIT_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Фотография'):
-        stats_user_click(username, get_cat1_for_identifier(PHOTO_IDENTIFIER), get_cat2_for_identifier(PHOTO_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(PHOTO_IDENTIFIER), get_cat2_for_identifier(PHOTO_IDENTIFIER))
         make_first_answer(PHOTO_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Графика'):
-        stats_user_click(username, get_cat1_for_identifier(GRAPHIC_IDENTIFIER), get_cat2_for_identifier(GRAPHIC_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(GRAPHIC_IDENTIFIER), get_cat2_for_identifier(GRAPHIC_IDENTIFIER))
         make_first_answer(GRAPHIC_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Живопись'):
-        stats_user_click(username, get_cat1_for_identifier(PAINTING_IDENTIFIER), get_cat2_for_identifier(PAINTING_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(PAINTING_IDENTIFIER), get_cat2_for_identifier(PAINTING_IDENTIFIER))
         make_first_answer(PAINTING_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Дизайн'):
-        stats_user_click(username, get_cat1_for_identifier(DESIGN_IDENTIFIER), get_cat2_for_identifier(DESIGN_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(DESIGN_IDENTIFIER), get_cat2_for_identifier(DESIGN_IDENTIFIER))
         make_first_answer(DESIGN_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Скульптура'):
-        stats_user_click(username, get_cat1_for_identifier(SCULPTURE_IDENTIFIER), get_cat2_for_identifier(SCULPTURE_IDENTIFIER))
+        db_manager.add_record(username, get_cat1_for_identifier(SCULPTURE_IDENTIFIER), get_cat2_for_identifier(SCULPTURE_IDENTIFIER))
         make_first_answer(SCULPTURE_IDENTIFIER, chat_id, process_step_2)
     elif message.text==('Главное меню'):
         start(message)
@@ -443,5 +452,6 @@ def make_first_answer(source_identifier, chat_id, handler):
 
 if __name__ == "__main__":
     initialize()
+    db_manager.initialize()
     bot.remove_webhook()
     bot.polling()

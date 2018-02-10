@@ -2,7 +2,7 @@ BOT_TOKEN = "325597084:AAF4cA-uCDYjmd7m0-pSaIxwyD7kjH7MLlg"
 
 PAGE_STEP = 3
 
-STATS_URL = "http://admin.theartr.ru/stat_backend/"
+DB_NAME = "bot_db.sqlite"
 
 MIN_CULT_CONNECTION_ERROR = "Не удалось соединиться с сервером МинКульт"
 

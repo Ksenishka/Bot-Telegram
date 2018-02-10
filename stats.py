@@ -1,23 +1,31 @@
-from urllib.request import urlopen
-from defines import STATS_URL
+import sqlite3
+from datetime import datetime
 
-def stats_user_connected(username):
-    url = "{}user?username={}&action=connected".format(STATS_URL, username)
-    do_urlopen(url)
+class SimpleDbManager:
+    def __init__(self, db_name):
+        self.conn = sqlite3.connect(db_name)
+        self.table = "actions"
 
-def stats_user_click(username, cat1, cat2=None):
-    url = "{}click?username={}&cat1={}".format(STATS_URL, username, cat1)
-    if cat2:
-        url += "&cat2={}".format(cat2)
-    do_urlopen(url)
+    def __del__(self):
+        self.conn.close()
 
-def do_urlopen(url):
-    try:
-        resp = urlopen(url)
-        return resp
-    except:
-        print("urlopen() for url={} failed".format(url))
-        return None
+    def initialize(self):
+        c = self.conn.cursor()
+        c.execute(
+        """
+        CREATE TABLE IF NOT EXISTS {}(user text, time datetime, category text, subcategory text)
+        """.format(self.table)
+        )
+        self.conn.commit()
+
+    def add_record(self, user, category, subcategory=""):
+        dt = datetime.now()
+        c = self.conn.cursor()
+        c.execute(
+        """
+        INSERT INTO {} VALUES('{}', '{}', '{}', '{}')
+        """.format(self.table, user, dt, category, subcategory))
+        self.conn.commit()
 
 sent_msg = 0
 def update_sent_msg():
