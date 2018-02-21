@@ -453,8 +453,13 @@ if __name__ == "__main__":
     initialize()
     db_manager.initialize()
     bot.remove_webhook()
-    try:
-        bot.polling(none_stop=True)
-    except Exception as err:
-        print("polling error: {}".format(err))
-        time.sleep(RETRY_PERIOD)
+
+    stop = False
+    while stop == False:
+        try:
+            stop = True
+            bot.polling(none_stop=True)
+        except Exception as err:
+            print("polling error: {}".format(err))
+            time.sleep(RETRY_PERIOD)
+            stop = False
