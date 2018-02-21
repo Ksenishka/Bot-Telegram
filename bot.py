@@ -457,4 +457,4 @@ if __name__ == "__main__":
         bot.polling(none_stop=True)
     except Exception as err:
         print("polling error: {}".format(err))
-        time.sleep(RETRY_TIME)
+        time.sleep(RETRY_PERIOD)
