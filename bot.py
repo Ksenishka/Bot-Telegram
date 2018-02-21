@@ -3,6 +3,7 @@
 import telebot
 from telebot import types
 
+import time
 import json
 import urllib.parse
 from urllib.request import urlopen
