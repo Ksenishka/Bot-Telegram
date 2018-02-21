@@ -4,8 +4,6 @@ import telebot
 from telebot import types
 
 import json
-import requests
-import urllib.request
 import urllib.parse
 from urllib.request import urlopen
 
@@ -120,7 +118,7 @@ def check_none(input, key, index=-1, subkey=""):
 
 def do_urlopen(url):
     try:
-        resp = urlopen(url)
+        resp = urlopen(url=url, timeout=MIN_CULT_TIMEOUT)
         return resp
     except:
         print("urlopen() for url={} failed".format(url))
@@ -454,4 +452,8 @@ if __name__ == "__main__":
     initialize()
     db_manager.initialize()
     bot.remove_webhook()
-    bot.polling()
+    try:
+        bot.polling(none_stop=True)
+    except Exception as err:
+        print("polling error: {}".format(err))
+        time.sleep(RETRY_TIME)
